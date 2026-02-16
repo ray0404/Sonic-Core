@@ -237,6 +237,64 @@ const DESCRIPTORS: Record<string, Omit<ModuleDescriptor, 'type'>> = {
           { name: 'intensity', defaultValue: 0.5, minValue: 0, maxValue: 1 },
           { name: 'refDb', defaultValue: -24, minValue: -60, maxValue: 0 },
       ]
+  },
+  ZIG_SATURATION: {
+    params: [
+      { name: 'drive', defaultValue: 0.5, minValue: 0, maxValue: 1 },
+      { name: 'type', defaultValue: 0, minValue: 0, maxValue: 2 },
+      { name: 'outputGain', defaultValue: 0, minValue: -24, maxValue: 24 },
+      { name: 'mix', defaultValue: 1, minValue: 0, maxValue: 1 },
+    ]
+  },
+  ZIG_COMPRESSOR: {
+    params: [
+      { name: 'threshold', defaultValue: -24, minValue: -60, maxValue: 0 },
+      { name: 'ratio', defaultValue: 4, minValue: 1, maxValue: 20 },
+      { name: 'attack', defaultValue: 0.01, minValue: 0.0001, maxValue: 1 },
+      { name: 'release', defaultValue: 0.1, minValue: 0.001, maxValue: 2 },
+      { name: 'makeup', defaultValue: 0, minValue: 0, maxValue: 24 },
+      { name: 'mix', defaultValue: 1, minValue: 0, maxValue: 1 },
+      { name: 'mode', defaultValue: 0, minValue: 0, maxValue: 3 },
+    ]
+  },
+  ZIG_LIMITER: {
+    params: [
+      { name: 'threshold', defaultValue: -6, minValue: -60, maxValue: 0 },
+      { name: 'release', defaultValue: 0.05, minValue: 0.001, maxValue: 2 },
+    ]
+  },
+  ZIG_DE_ESSER: {
+    params: [
+      { name: 'frequency', defaultValue: 6000, minValue: 2000, maxValue: 10000 },
+      { name: 'threshold', defaultValue: -20, minValue: -60, maxValue: 0 },
+      { name: 'ratio', defaultValue: 4, minValue: 1, maxValue: 20 },
+      { name: 'attack', defaultValue: 0.005, minValue: 0.001, maxValue: 0.1 },
+      { name: 'release', defaultValue: 0.05, minValue: 0.01, maxValue: 0.5 },
+    ]
+  },
+  ZIG_TRANSIENT_SHAPER: {
+    params: [
+      { name: 'attackGain', defaultValue: 0, minValue: -24, maxValue: 24 },
+      { name: 'sustainGain', defaultValue: 0, minValue: -24, maxValue: 24 },
+      { name: 'mix', defaultValue: 1, minValue: 0, maxValue: 1 },
+    ]
+  },
+  ZIG_BITCRUSHER: {
+    params: [
+      { name: 'bits', defaultValue: 8, minValue: 1, maxValue: 16 },
+      { name: 'normFreq', defaultValue: 1, minValue: 0.01, maxValue: 1 },
+      { name: 'mix', defaultValue: 1, minValue: 0, maxValue: 1 },
+    ]
+  },
+  SPECTRAL_MATCH: {
+    params: [
+      { name: 'amount', defaultValue: 0.5, minValue: 0, maxValue: 1 },
+    ]
+  },
+  LUFS_NORMALIZER: {
+    params: [
+      { name: 'targetLufs', defaultValue: -14, minValue: -24, maxValue: -6 },
+    ]
   }
 };
 

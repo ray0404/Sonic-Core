@@ -1,103 +1,181 @@
-# Sonic Forge ⚡
+# Sonic Forge
 
-**Professional Audio Mastering in the Browser.**
+Professional-grade, local-first audio mastering and processing platform. Sonic Forge bridges the gap between browser-based convenience and desktop-grade performance, offering a suite of real-time and offline audio tools.
 
-Sonic Forge is a local-first Progressive Web App (PWA) designed to bring desktop-class audio engineering to the web. By leveraging **AudioWorklets** for real-time processing and **Zig/WebAssembly** for heavy offline computation, it delivers a zero-latency, high-fidelity experience without uploading your data to the cloud.
+## Key Features
 
-![Sonic Forge Screenshot](public/screenshot-desktop.png)
+- **Zero-Latency Real-time Processing**: Powered by optimized AudioWorklets.
+- **High-Performance Offline DSP**: Smart processing engine written in Zig and compiled to WebAssembly.
+- **Local-First & Privacy-Centric**: All audio remains on your device; no server-side processing or cloud uploads.
+- **Universal Audio Platform**: Standalone core library (`sonic-core`), CLI tools, and a rich Web PWA.
+- **Native Plugin Export**: Export your DSP logic as VST3 or Audio Unit (AU) plugins.
+- **Batch Processing**: Automate audio workflows with a manifest-based "Director" system.
 
-## ✨ Key Features
+## Tech Stack
 
-### 🎛️ Real-Time Effects Rack
-Build your mastering chain with a suite of professional modules. Drag and drop to reorder.
-*   **Dynamics:** Compressor, Multiband Compressor, Limiter, Transient Shaper, De-Esser.
-*   **EQ & Filters:** Parametric EQ, Dynamic EQ, Mid/Side EQ, AutoWah.
-*   **Color & Saturation:** Tube Saturation, Distortion, Bitcrusher, Tape/Cab Sim.
-*   **Modulation & Space:** Chorus, Phaser, Tremolo, Feedback Delay, Stereo Imager.
-*   **Metering:** LUFS Loudness Meter, True Peak detection.
+- **Framework**: React 18 with Vite
+- **Language**: TypeScript 5.x, Zig 0.13.0
+- **State Management**: Zustand
+- **Styling**: Tailwind CSS, Framer Motion
+- **Audio Engine**: Web Audio API, AudioWorklets, WebAssembly
+- **Persistence**: IndexedDB (`idb-keyval`)
+- **CLI**: Ink (React for CLI), Commander
+- **Testing**: Vitest, React Testing Library
 
-### 🧠 Smart Processing (Zig/WASM)
-A dedicated "Smart Tools" panel powered by a high-performance **Zig** engine compiled to **WebAssembly**.
-*   **Loudness Normalization:** Precisely target -14 LUFS, -23 LUFS, or custom values (EBU R128).
-*   **Phase Rotation:** Recover headroom by correcting asymmetric waveforms (smearing transients).
-*   **De-Clipper:** Repair digital clipping artifacts using cubic interpolation.
-*   **Spectral Denoise:** Intelligent FFT-based background noise reduction.
-*   **Mono Bass:** Ensure mix compatibility by mono-summing frequencies below a target (e.g., 120Hz).
+## Prerequisites
 
-### 🎚️ Multi-Track Mixer
-*   **Track Control:** Individual Volume, Pan, Mute, and Solo for multiple audio tracks.
-*   **Master Bus:** Global processing chain for final glue and limiting.
-*   **Visualization:** Real-time RMS and Peak metering.
+- **Node.js**: 18.0 or higher
+- **Zig**: 0.13.0 (Required for compiling the DSP kernel)
+- **NPM**: (or pnpm/yarn)
 
-### 🔒 Local-First & Privacy
-*   **No Cloud Processing:** All DSP runs locally on your device.
-*   **Persistence:** Projects and audio files are automatically saved to your browser's IndexedDB.
-*   **Offline Capable:** Install as a PWA and use without an internet connection.
+## Getting Started
 
-## 🚀 Getting Started
+### 1. Clone the Repository
 
-### Prerequisites
-*   **Node.js 18+**
-*   **Zig 0.13.0+** (Only required if you intend to modify/build the WASM modules)
+```bash
+git clone https://github.com/user/sonic-forge.git
+cd sonic-forge
+```
 
-### Installation
+### 2. Install Dependencies
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/ray0404/SonicForge.git
-    cd sonic-forge
-    ```
+```bash
+npm install
+```
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
+### 3. Build the DSP Kernel (WASM)
 
-3.  **Build the WASM engine:**
-    ```bash
-    npm run build:wasm
-    ```
+Sonic Forge requires the Zig-based DSP kernel to be compiled to WebAssembly before running.
 
-4.  **Start the development server:**
-    ```bash
-    npm run dev
-    ```
+```bash
+npm run build:wasm
+```
 
-5.  **Open:** Navigate to `http://localhost:5173`.
+### 4. Start Development Server
 
-## 🧩 Workflows
+```bash
+npm run dev
+```
 
-### The "Smart Processing" Panel
-The Smart Processing tools operate in two distinct modes to fit your workflow:
+The application will be available at [http://localhost:5173](http://localhost:5173).
 
-1.  **Project Track Mode:**
-    *   Select a track from your current project.
-    *   Apply processes destructively to the track's source audio.
-    *   Use the **Undo/Redo** buttons to experiment safely.
+## Architecture
 
-2.  **External File Mode:**
-    *   Upload an audio file directly from your device.
-    *   Apply chainable processes (e.g., Denoise -> Normalize).
-    *   **Preview:** Scrub through the timeline to hear the results instantly.
-    *   **Download:** Export the processed WAV file without importing it into your project.
+Sonic Forge follows a strict **Three-Layer Architecture** to ensure modularity and performance.
 
-## 🛠️ Architecture for Developers
+### 1. Intent Layer (UI & Store)
+Captures user actions and manages application state. It uses Zustand for the global store and React for the interface.
+- **Path**: `src/`
+- **Key Store**: `src/store/useAudioStore.ts`
+- **Behavior**: Updates the Zustand store, which triggers subscriptions to update the engine.
 
-*   **State:** `Zustand` stores the "Intent" (UI state).
-*   **Orchestration:** `AudioEngine` (`packages/sonic-core/src/mixer.ts`) subscribes to the store and manages the Web Audio Graph.
-*   **Real-time DSP:** `AudioWorklets` (`packages/sonic-core/src/worklets/`) run in the Audio Thread for glitch-free playback.
-*   **Offline DSP:** `Zig` code (`packages/sonic-core/src/dsp/zig/`) is compiled to WASM and runs in a Web Worker for heavy lifting.
+### 2. Orchestration Layer (Engine)
+Translates state changes into Web Audio API calls and manages the audio graph.
+- **Path**: `packages/sonic-core/`
+- **Entry Point**: `packages/sonic-core/src/mixer.ts`
+- **Logic**: Handles track strips, bus connections, and parameter automation (`setTargetAtTime`).
 
-## 🏗️ Build Commands
+### 3. Processing Layer (DSP)
+The mathematical core of the application.
+- **Real-time**: AudioWorklet processors in `packages/sonic-core/src/worklets/`.
+- **Offline**: Zig kernels in `libs/sonic-dsp-kernel/` compiled to WASM.
 
-| Command | Description |
-| :--- | :--- |
-| `npm run dev` | Start local dev server (Vite). |
-| `npm run build` | Build the web application for production. |
-| `npm run build:wasm` | Compile Zig source to `public/wasm/dsp.wasm`. |
-| `npm run build:cli` | Build the headless CLI tool. |
-| `npm test` | Run unit tests (Vitest). |
+## Key Concepts
 
-## 📄 License
+### The "Trinity Pattern" (Real-time Effects)
+Adding a new real-time effect to the rack requires three components:
+1.  **Processor (DSP)**: Extends `AudioWorkletProcessor` in `packages/sonic-core/src/worklets/`.
+2.  **Node (Bridge)**: Extends `AudioWorkletNode` or `AudioNode`, handling parameter mapping and message passing.
+3.  **UI (Component)**: A React unit (e.g., `src/components/rack/CompressorUnit.tsx`) for user control.
+
+### Smart Processing (Offline Workflow)
+High-performance offline processing for file repair and normalization using the Zig/WASM engine.
+- **Loudness Normalization**: Target specific LUFS levels.
+- **Phase Rotation**: Recover headroom by smearing transients.
+- **De-Clipper**: Repair digital clipping via cubic interpolation.
+- **Spectral Denoise**: FFT-based noise reduction.
+
+### Directory Structure
+
+```text
+├── cli/                 # CLI Application (Ink/Commander)
+├── libs/
+│   └── sonic-dsp-kernel/ # Zig DSP source code
+├── packages/
+│   └── sonic-core/      # Headless Audio Engine (SDK)
+├── src/                 # Web Application (React/Vite)
+│   ├── components/      # UI Components (Rack, Mixer, Layout)
+│   ├── hooks/           # Custom React hooks
+│   ├── store/           # Zustand stores
+│   └── utils/           # Shared utilities
+├── public/              # Static assets and WASM artifacts
+└── docs/                # Project documentation
+```
+
+## CLI Usage
+
+Sonic Forge includes a powerful CLI for terminal-based audio processing.
+
+### Start Interactive TUI
+```bash
+npm run dev:cli
+```
+
+### Batch Processing (Director)
+Process a directory of files based on a `.sonic` manifest.
+```bash
+npx tsx cli/index.ts director manifest.json ./input ./output --parallel 4
+```
+
+### Export Native Plugins
+```bash
+# Export as VST3
+npx tsx cli/index.ts export vst3 --plugin compressor
+
+# Export as AU (macOS only)
+npx tsx cli/index.ts export au --plugin limiter
+```
+
+## Testing
+
+The project uses Vitest for both unit and component testing.
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in UI mode
+npx vitest --ui
+```
+
+## Building for Production
+
+### Web Application
+```bash
+npm run build
+```
+
+### CLI Tool
+```bash
+npm run build:cli
+```
+
+## Deployment
+
+The project is configured for **Firebase Hosting**.
+
+```bash
+# Build the project
+npm run build
+
+# Deploy to Firebase
+firebase deploy
+```
+
+## Contributing
+
+Please see [AGENTS.md](./AGENTS.md) for detailed operational guides and code conventions.
+
+## License
 
 MIT

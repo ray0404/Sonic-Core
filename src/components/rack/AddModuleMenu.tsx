@@ -25,6 +25,26 @@ export const AddModuleMenu: React.FC = () => {
   };
 
   const categories = {
+      'Sonic (Zig)': [
+          { label: 'Smart Level', type: 'SMART_LEVEL' },
+          { label: 'Tape Stabilizer', type: 'TAPE_STABILIZER' },
+          { label: 'Voice Isolate', type: 'VOICE_ISOLATE' },
+          { label: 'Echo Vanish', type: 'ECHO_VANISH' },
+          { label: 'Plosive Guard', type: 'PLOSIVE_GUARD' },
+          { label: 'De-Bleed (Sidechain)', type: 'DE_BLEED' },
+          { label: 'PsychoDynamic EQ', type: 'PSYCHO_DYNAMIC_EQ' },
+          { label: 'Spectral Denoise', type: 'SPECTRAL_DENOISE' },
+          { label: 'De-Clip', type: 'DE_CLIP' },
+          { label: 'Phase Rotation', type: 'PHASE_ROTATION' },
+          { label: 'Mono Bass', type: 'MONO_BASS' },
+          { label: 'Saturation (Zig)', type: 'ZIG_SATURATION' },
+          { label: 'Compressor (Zig)', type: 'ZIG_COMPRESSOR' },
+          { label: 'Spectral Match', type: 'SPECTRAL_MATCH' },
+          { label: 'LUFS Normalizer', type: 'LUFS_NORMALIZER' },
+          { label: 'Limiter (Zig)', type: 'ZIG_LIMITER' },
+          { label: 'De-Esser (Zig)', type: 'ZIG_DE_ESSER' },
+          { label: 'Transient Shaper (Zig)', type: 'ZIG_TRANSIENT_SHAPER' },
+      ],
       'Dynamics': [
           { label: 'Compressor', type: 'COMPRESSOR' },
           { label: 'Multiband Comp', type: 'MULTIBAND_COMPRESSOR' },

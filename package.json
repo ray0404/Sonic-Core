@@ -10,10 +10,10 @@
     "build": "npm run copy-docs && tsc && vite build",
     "build:wasm": "zig build-exe libs/sonic-dsp-kernel/main.zig -target wasm32-freestanding -rdynamic -fno-entry -O ReleaseFast -femit-bin=public/wasm/dsp.wasm",
     "prebuild:cli": "npm run build:wasm",
-    "build:cli": "npm run build && tsc -p tsconfig.cli.json && mkdir -p dist/cli/wasm && cp public/wasm/dsp.wasm dist/cli/wasm/dsp.wasm",
+    "build:cli": "npm run build && tsc -p tsconfig.cli.json && mkdir -p dist/cli/cli/wasm && cp public/wasm/dsp.wasm dist/cli/cli/wasm/dsp.wasm",
     "predev:cli": "npm run build:wasm",
     "dev:cli": "tsx cli/index.ts start",
-    "preview:cli": "npm run build:cli && node dist/cli/index.js start",
+    "preview:cli": "npm run build:cli && node dist/cli/cli/index.js start",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest"

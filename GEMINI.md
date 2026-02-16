@@ -1,142 +1,74 @@
-# Sonic Forge - Project Context
+# Gemini Added Memories
+**Common Credentials:**
+- My email is: ray.valentin.04@gmail.com
 
-## 1. Project Overview
+**Directives:**
+- When utilizing `conductor` extension, **DO NOT** add `conductor/` directory to repo; add to .gitignore immediatley upon creation; keep local *only* throughout any/all processes
+- When starting a *new* session: assess whether or not gemini-cli has proper project context loaded/cached. If context amount/quality is questionable (or if it is a brand new session--or session has 95% or more 'context' remaining), analyze the project/repo using codebase investigator agent to gain adequate project context, priming AI model for project updates
+- Utilize web_search tool liberally; when unsure about a process/debug/optimization/etc., run (1-3) web search(es) in order to gain additional context/info to aid in assisting user with development-based processes and/or queries
 
-**Sonic Forge** is a high-performance, local-first Progressive Web App (PWA) designed for professional audio mastering and processing. It bridges the gap between browser-based tools and desktop Digital Audio Workstations (DAWs) by leveraging cutting-edge web technologies like **AudioWorklets** for zero-latency real-time processing and **WebAssembly (via Zig)** for heavy-duty offline computation.
+***
 
-### Core Philosophy
-*   **Zero-Latency:** The UI is decoupled from the audio engine. Real-time audio processing happens in the Audio Thread to prevent glitches.
-*   **Local-First:** All audio data lives on the user's device. No audio is ever uploaded to a server for processing, ensuring privacy and speed.
-*   **High Fidelity:** Supports high sample rates (up to 96kHz) and 32-bit floating-point processing.
-*   **Resilient:** Autosaves state to IndexedDB, allowing users to close the tab and resume later without data loss.
+# Gemini CLI Directives
+This section details how Gemini CLI (you) are to read, understand, and/or process this (and any other) GEMINI.md file and its contents, for global and/or directory specific context and/or instructions, respectiveley.
 
-## 2. Architecture
+## How to Interpret
+Independent 'sections' of GEMINI.md are separated by (nested between) triple-asterisks ("***") that begin on a new line; each section will have its own header 1 (h1) and its end (and start of new/next section) is denoted by aforementioned triple-asterisks. Each sections (h1) is to be interpreted as its literal denotation, to the best of your (Gemini's) ability. For sections whose header 1 (h1) begin as 'Persona' or 'Context' (or 'Gemini Context'), refer to the following similarly labeled (h3) parts of this section for additional, specific interpretation directives.
 
-Sonic Forge follows a strict **Three-Layer Architecture** to respect Web Audio API thread boundaries and ensure UI responsiveness.
+### Persona
+- Any section whose header 1 (h1—#) begins with 'Persona', is to be treated as agent or "bot-like" instructions; specific instructions on how to behave, respond, communicate, interact, process, etc..
+- Persona's **MUST** be explicitly *toggled on*/enabled, with a phrase such as, "act as VibeCoder", "execute VibeCoder persona", "persona: VibeCoder", "as 'VibeCoder', do process...", "start `VibeCoder`", etc..
+- Whenever a persona is *active*, this must be *explicitly* denoted atop start of replies and/or prefixing status message's, etc..
+- Personas must be manually *toggled off*/stopped, **unless** user specifies to AI/ agent to only take on persona for one/that turn (or any exact user specified amount of turns).
 
-### Layer 1: Intent Layer (UI & State)
-*   **Context:** Main Thread.
-*   **Technology:** React 18, Zustand, Tailwind CSS.
-*   **Role:** Manages the visual state and user intent. It does *not* touch audio buffers directly.
-*   **Key Files:**
-    *   `src/store/useAudioStore.ts`: The single source of truth for the project state (tracks, rack modules, parameters).
-    *   `src/components/`: React components that visualize the state and dispatch actions.
+***
 
-### Layer 2: Orchestration Layer (Audio Engine)
-*   **Context:** Main Thread.
-*   **Technology:** TypeScript, `standardized-audio-context`.
-*   **Role:** Subscribes to the Store and translates state changes into imperative Web Audio API calls. It manages the lifecycle of `AudioContext`, `AudioNodes`, and connections.
-*   **Key Files:**
-    *   `src/audio/mixer.ts`: The central engine singleton.
-    *   `src/audio/core/track-strip.ts`: Manages the signal chain for a single track.
-    *   `src/audio/core/context-manager.ts`: Handles AudioContext resume/suspend states.
+# Persona: VibeCoder
 
-### Layer 3: Processing Layer (DSP)
-*   **Context:** Audio Thread (Real-time) & Worker Thread (Offline).
-*   **Technology:** AudioWorklet (JS/TS), Zig (WASM).
-*   **Role:** Performs the actual mathematical manipulation of audio samples.
-*   **Key Files:**
-    *   `src/audio/worklets/`: AudioWorkletProcessors for real-time effects (EQ, Compression).
-    *   `src/audio/dsp/zig/`: Zig source code for offline processing algorithms.
-    *   `src/audio/workers/`: Web Workers that host the WASM runtime for offline batch processing.
+## ROLE & GOAL
+You are an expert AI Full-Stack & DevOps Architect. Your primary goal is to be a hyper-competent assistant who seamlessly bridges the gap between local development ("vibe coding") and successful production deployment. You are a partner who not only helps write the code but also ensures it gets online successfully and reliably on platforms like Replit and Google Cloud (specifically Firebase Hosting). Your defining principle is to **understand before you act**.
 
-## 3. Technology Stack
+## CORE DIRECTIVES
+1.  **Mandate for Holistic Contextual Analysis**: Before providing any code, configuration, or structural advice, you MUST first perform and state a brief analysis of the project. This is a **non-negotiable first step**. Your analysis must summarize:
+    * **The Project's Apparent Goal**: What does the application do? (e.g., "This appears to be a React-based e-commerce front-end that communicates with a headless CMS.")
+    * **The Core Technology Stack**: What are the key languages, frameworks, and major libraries? (e.g., "The stack is TypeScript, Next.js, and Tailwind CSS, with dependencies managed by npm.")
+    * **The Existing Architecture**: How is the project organized? (e.g., "The project follows a feature-sliced design, with components, services, and hooks co-located by feature.")
+    This mandatory step forces you to synthesize context from the entire repository, preventing simple but costly errors that arise from isolated, context-free changes. **DO NOT provide code or commands until you have stated this analysis.**
 
-*   **Frontend:** React 18, Vite 5
-*   **Language:** TypeScript 5.x
-*   **Styling:** Tailwind CSS, Lucide React (Icons)
-*   **State Management:** Zustand
-*   **Persistence:** `idb-keyval` (IndexedDB wrapper)
-*   **Audio API:** Web Audio API, `standardized-audio-context`
-*   **Offline DSP:** Zig 0.13.0 compiled to WebAssembly
-*   **CLI:** Ink, Puppeteer (for headless operation)
-*   **Testing:** Vitest
+2.  **Project Context is King**: ALWAYS prioritize the provided Git repository context (`--context "git:."`) to inform your answers. Your analysis MUST include looking for deployment-related configuration files (`firebase.json`, `.replit`, `replit.nix`, `Dockerfile`, `cloudbuild.yaml`, etc.). Your suggestions must be tailored to the project's existing stack, dependencies, and architecture.
 
-## 4. Smart Processing (Zig/WASM)
+3.  **Deployment-First Mindset**: For any coding task, proactively consider the deployment implications. If a user asks for a new feature, you might also suggest how to handle necessary environment variables or update build configurations. Your job is to help the user think like a DevOps professional.
 
-A distinct feature of Sonic Forge is its "Smart Tools" panel, which utilizes a compiled WebAssembly module for CPU-intensive offline processing tasks.
+***
 
-*   **Source Code:** `src/audio/dsp/zig/main.zig`
-*   **Compiled Binary:** `public/wasm/dsp.wasm`
-*   **Bridge:** `src/audio/workers/offline-processor.worker.ts` handles the communication between the Main Thread and the WASM memory linear memory.
+# Gemini Context: Sonic Forge Architecture
 
-### Supported Processors
-1.  **Loudness Normalization:** Analysis and gain adjustment to meet specific LUFS targets (e.g., -14 LUFS for streaming).
-2.  **Phase Rotation:** Uses a chain of all-pass filters to smear transients and reduce peak amplitude without affecting perceived loudness (headroom recovery).
-3.  **De-Clipper:** Restores clipped peaks using cubic Hermite spline interpolation.
-4.  **Adaptive Spectral Denoise:** Performs FFT analysis to identify and subtract steady-state noise profiles.
-5.  **Mono Bass:** Uses a Linkwitz-Riley crossover to sum frequencies below a specific cutoff (e.g., 120Hz) to mono, ensuring phase compatibility for vinyl and club systems.
+This project is a high-performance audio processing platform.
 
-### Workflow Modes
-The `BatchProcessMenu` component (`src/components/layout/panels/BatchProcessMenu.tsx`) supports two workflows:
-*   **Project Track Mode:** Modifies the source audio of a track currently loaded in the DAW. Features a history stack for Undo/Redo.
-*   **External File Mode:** Operates as a standalone tool. Users upload a file, process it, preview the result on a scrubbable timeline, and download it as a WAV file without importing it into the main project.
+## Audio Engine Architecture
+1.  **Sonic-Core SDK**: Headless audio engine managing the Web Audio graph and worklet connections.
+2.  **Zig DSP Kernel**: Low-level signal processing compiled to WASM for high performance.
+3.  **Trinity Pattern**: Adding effects requires a Processor (DSP), a Node (JS/TS Wrapper), and a UI Component (React).
 
-## 5. Directory Structure
+## Deployment Pattern
+- **Firebase Hosting**: Primary deployment target.
+- **WASM Management**: `npm run build:wasm` must be run before development or deployment to ensure the latest DSP logic is available in `public/wasm/`.
 
-```
-/
-├── cli/                    # Headless CLI implementation (Ink/Puppeteer)
-├── public/
-│   └── wasm/               # Compiled DSP binaries (dsp.wasm)
-├── src/
-│   ├── audio/              # Core Audio Logic
-│   │   ├── core/           # TrackStrip, BusStrip, NodeFactory
-│   │   ├── dsp/zig/        # Zig Source Code
-│   │   ├── workers/        # OfflineProcessorWorker & Client
-│   │   ├── worklets/       # Real-time AudioWorklet Processors
-│   │   └── mixer.ts        # Main Engine Entry Point
-│   ├── components/
-│   │   ├── layout/         # App Shell, Panels (Smart Tools, Export)
-│   │   ├── mixer/          # Mixer View (Faders)
-│   │   └── rack/           # Effect Rack & Module UIs
-│   ├── hooks/              # Custom Hooks (useProjectPersistence)
-│   ├── store/              # Zustand Stores (useAudioStore)
-│   └── main.tsx            # Application Entry
-├── package.json
-└── vite.config.ts
+## CLI Tooling
+- **Director**: Batch processing tool using the `NativeEngine` to process files according to a manifest.
+- **Export**: Generates native VST3/AU wrappers using the Zig build system.
+
+***
+
+# Gemini Context: repomix
+
+## 🚀 Session Priming
+When you need to "prime" your context, use:
+```bash
+repomix --stdout
 ```
 
-## 6. Development Conventions
-
-### The "Trinity Pattern"
-To add a new real-time audio effect, you must implement three distinct parts:
-1.  **DSP Processor:** `src/audio/worklets/[name]-processor.js`. This runs in the Audio Thread and extends `AudioWorkletProcessor`.
-2.  **Audio Node:** `src/audio/worklets/[Name]Node.ts`. This runs in the Main Thread, extends `AudioWorkletNode`, and provides a typed interface for parameters.
-3.  **UI Component:** `src/components/rack/[Name]Unit.tsx`. A React component that renders the knobs/meters and updates the store.
-
-### Zig/WASM Workflow
-To add a new offline processor:
-1.  **Implement in Zig:** Add the function to `src/audio/dsp/zig/main.zig` and export it (`export fn`).
-2.  **Update Worker:** Add a handler in `src/audio/workers/offline-processor.worker.ts` to call the WASM function.
-3.  **Update Client:** Add a typed method to `src/audio/workers/OfflineProcessorClient.ts`.
-4.  **Update UI:** Add a button/control in `src/components/layout/panels/BatchProcessMenu.tsx`.
-
-## 7. Building and Running
-
-### Prerequisites
-*   Node.js 18+
-*   Zig 0.13.0+ (Required for `npm run build:wasm`)
-
-### Commands
-*   **`npm run dev`**: Start the Vite development server.
-*   **`npm run build`**: Build the web application for production.
-*   **`npm run build:wasm`**: Compile the Zig source code into `public/wasm/dsp.wasm`. **Must be run after any changes to `.zig` files.**
-*   **`npm run build:cli`**: Build the headless CLI tool.
-*   **`npm test`**: Run the Vitest test suite.
-
-## 8. State Management & Persistence
-
-*   **Store:** `useAudioStore` manages the application state. It does not store heavy binary data (audio buffers).
-*   **Binary Data:** AudioBuffers are stored in the `AudioContext` and managed by the `MixerEngine`.
-*   **Persistence:** `useProjectPersistence` hook subscribes to store changes.
-    *   Metadata (tracks, settings) is saved to `current_project_meta` in IndexedDB.
-    *   Binary Audio (blobs) are saved to `track_[id]_source` keys in IndexedDB.
-    *   On load, the store is hydrated first, followed by asynchronous loading of audio blobs.
-
-## 9. CLI Tool
-
-The CLI (`cli/index.ts`) allows running Sonic Forge in a headless environment (e.g., CI/CD pipelines).
-*   It launches a headless Chrome instance via Puppeteer.
-*   It loads the engine context (`dist/headless.html`).
-*   It bridges commands from the terminal (Node.js) to the browser context to perform rendering or analysis.
+For remote analysis:
+```bash
+repomix --remote <owner>/<repo> --stdout
+```

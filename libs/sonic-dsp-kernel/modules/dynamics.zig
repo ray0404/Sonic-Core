@@ -141,7 +141,8 @@ pub fn processCompressor(
     attack: f32,
     release: f32,
     makeup: f32,
-    mix: f32
+    mix: f32,
+    mode: i32
 ) void {
     var comp = Compressor{
         .threshold = threshold,
@@ -150,6 +151,7 @@ pub fn processCompressor(
         .release = release * 1000.0,
         .makeup = makeup,
         .mix = mix,
+        .mode = mode,
         .sample_rate = sample_rate,
     };
     comp.process(data);

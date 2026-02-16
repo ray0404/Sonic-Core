@@ -38,6 +38,42 @@ import deesserUrl from '@sonic-core/worklets/deesser-processor.js?worker&url';
 import stereoImagerUrl from '@sonic-core/worklets/stereo-imager-processor.js?worker&url';
 // @ts-ignore
 import multibandCompressorUrl from '@sonic-core/worklets/multiband-compressor-processor.js?worker&url';
+// @ts-ignore
+import smartLevelUrl from '@sonic-core/worklets/smart-level-processor.js?worker&url';
+// @ts-ignore
+import tapeStabilizerUrl from '@sonic-core/worklets/tape-stabilizer-processor.js?worker&url';
+// @ts-ignore
+import voiceIsolateUrl from '@sonic-core/worklets/voice-isolate-processor.js?worker&url';
+// @ts-ignore
+import echoVanishUrl from '@sonic-core/worklets/echo-vanish-processor.js?worker&url';
+// @ts-ignore
+import plosiveGuardUrl from '@sonic-core/worklets/plosive-guard-processor.js?worker&url';
+// @ts-ignore
+import psychoDynamicEqUrl from '@sonic-core/worklets/psycho-dynamic-eq-processor.js?worker&url';
+// @ts-ignore
+import deBleedUrl from '@sonic-core/worklets/de-bleed-processor.js?worker&url';
+// @ts-ignore
+import spectralDenoiseUrl from '@sonic-core/worklets/spectral-denoise-processor.js?worker&url';
+// @ts-ignore
+import deClipUrl from '@sonic-core/worklets/de-clip-processor.js?worker&url';
+// @ts-ignore
+import phaseRotationUrl from '@sonic-core/worklets/phase-rotation-processor.js?worker&url';
+// @ts-ignore
+import monoBassUrl from '@sonic-core/worklets/mono-bass-processor.js?worker&url';
+// @ts-ignore
+import zigSaturationUrl from '@sonic-core/worklets/zig-saturation-processor.js?worker&url';
+// @ts-ignore
+import zigCompressorUrl from '@sonic-core/worklets/zig-compressor-processor.js?worker&url';
+// @ts-ignore
+import zigLimiterUrl from '@sonic-core/worklets/zig-limiter-processor.js?worker&url';
+// @ts-ignore
+import zigDeEsserUrl from '@sonic-core/worklets/zig-de-esser-processor.js?worker&url';
+// @ts-ignore
+import zigTransientUrl from '@sonic-core/worklets/zig-transient-shaper-processor.js?worker&url';
+// @ts-ignore
+import spectralMatchUrl from '@sonic-core/worklets/spectral-match-processor.js?worker&url';
+// @ts-ignore
+import lufsNormalizerUrl from '@sonic-core/worklets/lufs-normalizer-processor.js?worker&url';
 
 export class ViteWorkletProvider implements WorkletProvider {
     getModuleUrls(): string[] {
@@ -60,7 +96,25 @@ export class ViteWorkletProvider implements WorkletProvider {
             compressorUrl,
             deesserUrl,
             stereoImagerUrl,
-            multibandCompressorUrl
+            multibandCompressorUrl,
+            smartLevelUrl,
+            tapeStabilizerUrl,
+            voiceIsolateUrl,
+            echoVanishUrl,
+            plosiveGuardUrl,
+            psychoDynamicEqUrl,
+            deBleedUrl,
+            spectralDenoiseUrl,
+            deClipUrl,
+            phaseRotationUrl,
+            monoBassUrl,
+            zigSaturationUrl,
+            zigCompressorUrl,
+            zigLimiterUrl,
+            zigDeEsserUrl,
+            zigTransientUrl,
+            spectralMatchUrl,
+            lufsNormalizerUrl
         ];
     }
 }

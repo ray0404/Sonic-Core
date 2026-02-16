@@ -38,6 +38,24 @@ import { CompressorUnit } from './CompressorUnit';
 import { DeEsserUnit } from './DeEsserUnit';
 import { StereoImagerUnit } from './StereoImagerUnit';
 import { MultibandCompressorUnit } from './MultibandCompressorUnit';
+import { SmartLevelUnit } from './SmartLevelUnit';
+import { TapeStabilizerUnit } from './TapeStabilizerUnit';
+import { VoiceIsolateUnit } from './VoiceIsolateUnit';
+import { EchoVanishUnit } from './EchoVanishUnit';
+import { PlosiveGuardUnit } from './PlosiveGuardUnit';
+import { PsychoDynamicEQUnit } from './PsychoDynamicEQUnit';
+import { DeBleedUnit } from './DeBleedUnit';
+import { SpectralDenoiseUnit } from './SpectralDenoiseUnit';
+import { DeClipUnit } from './DeClipUnit';
+import { PhaseRotationUnit } from './PhaseRotationUnit';
+import { MonoBassUnit } from './MonoBassUnit';
+import { ZigSaturationUnit } from './ZigSaturationUnit';
+import { ZigCompressorUnit } from './ZigCompressorUnit';
+import { ZigLimiterUnit } from './ZigLimiterUnit';
+import { ZigDeEsserUnit } from './ZigDeEsserUnit';
+import { ZigTransientShaperUnit } from './ZigTransientShaperUnit';
+import { SpectralMatchUnit } from './SpectralMatchUnit';
+import { LufsNormalizerUnit } from './LufsNormalizerUnit';
 
 
 function SortableItem({ id, children }: { id: string, children: (dragHandleProps: any) => React.ReactNode }) {
@@ -147,6 +165,24 @@ export const EffectsRack: React.FC = () => {
                                     case 'DE_ESSER': return <DeEsserUnit {...commonProps} onUpdate={onUpdate} />;
                                     case 'STEREO_IMAGER': return <StereoImagerUnit {...commonProps} onUpdate={onUpdate} />;
                                     case 'MULTIBAND_COMPRESSOR': return <MultibandCompressorUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'SMART_LEVEL': return <SmartLevelUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'TAPE_STABILIZER': return <TapeStabilizerUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'VOICE_ISOLATE': return <VoiceIsolateUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'ECHO_VANISH': return <EchoVanishUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PLOSIVE_GUARD': return <PlosiveGuardUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PSYCHO_DYNAMIC_EQ': return <PsychoDynamicEQUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'DE_BLEED': return <DeBleedUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'SPECTRAL_DENOISE': return <SpectralDenoiseUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'DE_CLIP': return <DeClipUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PHASE_ROTATION': return <PhaseRotationUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'MONO_BASS': return <MonoBassUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'ZIG_SATURATION': return <ZigSaturationUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'ZIG_COMPRESSOR': return <ZigCompressorUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'ZIG_LIMITER': return <ZigLimiterUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'ZIG_DE_ESSER': return <ZigDeEsserUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'ZIG_TRANSIENT_SHAPER': return <ZigTransientShaperUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'SPECTRAL_MATCH': return <SpectralMatchUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'LUFS_NORMALIZER': return <LufsNormalizerUnit {...commonProps} onUpdate={onUpdate} />;
                                     default:
                                         return <div className="p-4 bg-red-900/50 text-red-200 rounded">Unknown Module: {module.type}</div>;
                                 }

@@ -133,6 +133,24 @@ const modules = [
   'chorus',
   'bitcrusher',
   'autowah',
+  'smart-level',
+  'tape-stabilizer',
+  'voice-isolate',
+  'echo-vanish',
+  'plosive-guard',
+  'de-bleed',
+  'psycho-dynamic-eq',
+  'spectral-denoise',
+  'de-clip',
+  'phase-rotation',
+  'mono-bass',
+  'zig-saturation',
+  'zig-compressor',
+  'zig-limiter',
+  'zig-de-esser',
+  'zig-transient-shaper',
+  'spectral-match',
+  'lufs-normalizer'
 ];
 
 const modulesCommand = program.command('modules')

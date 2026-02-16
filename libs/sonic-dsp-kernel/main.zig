@@ -34,9 +34,9 @@ export fn free(ptr: [*]f32, len: usize) void {
 
 export fn process_compressor(
     ptr: [*]f32, len: usize, sample_rate: f32,
-    threshold: f32, ratio: f32, attack: f32, release: f32, makeup: f32, mix: f32
+    threshold: f32, ratio: f32, attack: f32, release: f32, makeup: f32, mix: f32, mode: i32
 ) void {
-    dyn.processCompressor(ptr[0..len], sample_rate, threshold, ratio, attack, release, makeup, mix);
+    dyn.processCompressor(ptr[0..len], sample_rate, threshold, ratio, attack, release, makeup, mix, mode);
 }
 
 export fn process_limiter(ptr: [*]f32, len: usize, sample_rate: f32, threshold: f32, release: f32) void {

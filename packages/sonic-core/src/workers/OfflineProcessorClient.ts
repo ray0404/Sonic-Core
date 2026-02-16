@@ -6,7 +6,8 @@
 import ProcessorWorker from './offline-processor.worker?worker';
 
 export type ProcessType = 'NORMALIZE' | 'DC_OFFSET' | 'STRIP_SILENCE' | 'ANALYZE_LUFS' | 'DENOISE' |
-                          'LUFS_NORMALIZE' | 'PHASE_ROTATION' | 'DECLIP' | 'SPECTRAL_DENOISE' | 'MONO_BASS';
+                          'LUFS_NORMALIZE' | 'PHASE_ROTATION' | 'DECLIP' | 'SPECTRAL_DENOISE' | 'MONO_BASS' |
+                          'VOICE_ISOLATE' | 'TAPE_STABILIZER' | 'ECHO_VANISH' | 'PLOSIVE_GUARD';
 
 export interface ProcessResult {
   leftChannel: Float32Array;
@@ -99,6 +100,22 @@ export class OfflineProcessorClient {
    */
   async monoBass(left: Float32Array, right: Float32Array, sampleRate: number, freq: number = 120) {
       return this.process('MONO_BASS', left, right, sampleRate, { freq });
+  }
+
+  async isolateVoice(left: Float32Array, right: Float32Array, sampleRate: number, amount: number = 0.5) {
+      return this.process('VOICE_ISOLATE', left, right, sampleRate, { amount });
+  }
+
+  async stabilizeTape(left: Float32Array, right: Float32Array, sampleRate: number, nominal: number, min: number, max: number, amount: number) {
+      return this.process('TAPE_STABILIZER', left, right, sampleRate, { nominal, min, max, amount });
+  }
+
+  async removeEcho(left: Float32Array, right: Float32Array, sampleRate: number, amount: number, tailMs: number) {
+      return this.process('ECHO_VANISH', left, right, sampleRate, { amount, tailMs });
+  }
+
+  async removePlosives(left: Float32Array, right: Float32Array, sampleRate: number, sensitivity: number, strength: number, cutoff: number) {
+      return this.process('PLOSIVE_GUARD', left, right, sampleRate, { sensitivity, strength, cutoff });
   }
 
   terminate() {

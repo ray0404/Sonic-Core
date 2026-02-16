@@ -22,6 +22,24 @@ import { CompressorNode } from "../worklets/CompressorNode.js";
 import { DeEsserNode } from "../worklets/DeEsserNode.js";
 import { StereoImagerNode } from "../worklets/StereoImagerNode.js";
 import { MultibandCompressorNode } from "../worklets/MultibandCompressorNode.js";
+import { SmartLevelNode } from "../worklets/SmartLevelNode.js";
+import { TapeStabilizerNode } from "../worklets/TapeStabilizerNode.js";
+import { VoiceIsolateNode } from "../worklets/VoiceIsolateNode.js";
+import { EchoVanishNode } from "../worklets/EchoVanishNode.js";
+import { PlosiveGuardNode } from "../worklets/PlosiveGuardNode.js";
+import { PsychoDynamicEQNode } from "../worklets/PsychoDynamicEQNode.js";
+import { DeBleedNode } from "../worklets/DeBleedNode.js";
+import { SpectralDenoiseNode } from "../worklets/SpectralDenoiseNode.js";
+import { DeClipNode } from "../worklets/DeClipNode.js";
+import { PhaseRotationNode } from "../worklets/PhaseRotationNode.js";
+import { MonoBassNode } from "../worklets/MonoBassNode.js";
+import { ZigSaturationNode } from "../worklets/ZigSaturationNode.js";
+import { ZigCompressorNode } from "../worklets/ZigCompressorNode.js";
+import { ZigLimiterNode } from "../worklets/ZigLimiterNode.js";
+import { ZigDeEsserNode } from "../worklets/ZigDeEsserNode.js";
+import { ZigTransientShaperNode } from "../worklets/ZigTransientShaperNode.js";
+import { SpectralMatchNode } from "../worklets/SpectralMatchNode.js";
+import { LufsNormalizerNode } from "../worklets/LufsNormalizerNode.js";
 
 export class NodeFactory {
     static create(module: RackModule, context: IAudioContext | IOfflineAudioContext, assets: Record<string, AudioBuffer>): IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | null {
@@ -48,6 +66,24 @@ export class NodeFactory {
                 case 'DE_ESSER': node = new DeEsserNode(context); break;
                 case 'STEREO_IMAGER': node = new StereoImagerNode(context); break;
                 case 'MULTIBAND_COMPRESSOR': node = new MultibandCompressorNode(context); break;
+                case 'SMART_LEVEL': node = new SmartLevelNode(context); break;
+                case 'TAPE_STABILIZER': node = new TapeStabilizerNode(context); break;
+                case 'VOICE_ISOLATE': node = new VoiceIsolateNode(context); break;
+                case 'ECHO_VANISH': node = new EchoVanishNode(context); break;
+                case 'PLOSIVE_GUARD': node = new PlosiveGuardNode(context); break;
+                case 'PSYCHO_DYNAMIC_EQ': node = new PsychoDynamicEQNode(context); break;
+                case 'DE_BLEED': node = new DeBleedNode(context); break;
+                case 'SPECTRAL_DENOISE': node = new SpectralDenoiseNode(context); break;
+                case 'DE_CLIP': node = new DeClipNode(context); break;
+                case 'PHASE_ROTATION': node = new PhaseRotationNode(context); break;
+                case 'MONO_BASS': node = new MonoBassNode(context); break;
+                case 'ZIG_SATURATION': node = new ZigSaturationNode(context); break;
+                case 'ZIG_COMPRESSOR': node = new ZigCompressorNode(context); break;
+                case 'ZIG_LIMITER': node = new ZigLimiterNode(context); break;
+                case 'ZIG_DE_ESSER': node = new ZigDeEsserNode(context); break;
+                case 'ZIG_TRANSIENT_SHAPER': node = new ZigTransientShaperNode(context); break;
+                case 'SPECTRAL_MATCH': node = new SpectralMatchNode(context); break;
+                case 'LUFS_NORMALIZER': node = new LufsNormalizerNode(context); break;
                 default: return null;
             }
 

@@ -20,15 +20,25 @@ export const createDefaultModule = (type: RackModuleType, id?: string): RackModu
     else if (type === 'COMPRESSOR') params = { threshold: -24, ratio: 4, attack: 0.01, release: 0.1, knee: 5, makeupGain: 0, mode: 0, mix: 1 };
     else if (type === 'DE_ESSER') params = { frequency: 6000, threshold: -20, ratio: 4, attack: 0.005, release: 0.05, monitor: 0, bypass: 0 };
     else if (type === 'STEREO_IMAGER') params = { lowFreq: 150, highFreq: 2500, widthLow: 0.0, widthMid: 1.0, widthHigh: 1.2, bypass: 0 };
-    else if (type === 'MULTIBAND_COMPRESSOR') {
-        params = {
-            lowFreq: 150, highFreq: 2500,
-            threshLow: -24, ratioLow: 4, attLow: 0.01, relLow: 0.1, gainLow: 0,
-            threshMid: -24, ratioMid: 4, attMid: 0.01, relMid: 0.1, gainMid: 0,
-            threshHigh: -24, ratioHigh: 4, attHigh: 0.01, relHigh: 0.1, gainHigh: 0,
-            bypass: 0
-        };
-    }
+    else if (type === 'PLOSIVE_GUARD') params = { sensitivity: 0.5, strength: 0.5, cutoff: 120 };
+    else if (type === 'VOICE_ISOLATE') params = { amount: 0.5 };
+    else if (type === 'SMART_LEVEL') params = { targetLufs: -14, maxGainDb: 12, gateThresholdDb: -60 };
+    else if (type === 'DE_BLEED') params = { sensitivity: 0.5, threshold: -40 };
+    else if (type === 'TAPE_STABILIZER') params = { nominalFreq: 3150, scanMin: 3000, scanMax: 3300, amount: 0.5 };
+    else if (type === 'ECHO_VANISH') params = { amount: 0.5, tailMs: 500 };
+    else if (type === 'PSYCHO_DYNAMIC_EQ') params = { intensity: 0.5, refDb: -24 };
+    else if (type === 'SPECTRAL_DENOISE') params = {};
+    else if (type === 'DE_CLIP') params = { threshold: 0.99 };
+    else if (type === 'PHASE_ROTATION') params = {};
+    else if (type === 'MONO_BASS') params = { frequency: 120 };
+    else if (type === 'ZIG_COMPRESSOR') params = { threshold: -24, ratio: 4, attack: 0.01, release: 0.1, makeup: 0, mix: 1, mode: 0 };
+    else if (type === 'ZIG_SATURATION') params = { drive: 0.5, type: 0, outputGain: 0, mix: 1 };
+    else if (type === 'ZIG_BITCRUSHER') params = { bits: 8, normFreq: 1, mix: 1 };
+    else if (type === 'ZIG_LIMITER') params = { threshold: -6, release: 0.05 };
+    else if (type === 'ZIG_DE_ESSER') params = { frequency: 6000, threshold: -20, ratio: 4, attack: 0.005, release: 0.05 };
+    else if (type === 'ZIG_TRANSIENT_SHAPER') params = { attackGain: 0, sustainGain: 0, mix: 1 };
+    else if (type === 'SPECTRAL_MATCH') params = { amount: 0.5, isLearning: 0, hasReference: false };
+    else if (type === 'LUFS_NORMALIZER') params = { targetLufs: -14 };
 
     return {
         id: id || crypto.randomUUID(),

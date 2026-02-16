@@ -407,6 +407,60 @@ export class NativeEngine implements SonicEngine {
               // DE_BLEED requires source audio - use current as both for self-processing
               current = this.sdk!.processDebleed(current, current, mod.parameters.sensitivity ?? 0.5, mod.parameters.threshold ?? -40);
               break;
+         case 'SPECTRAL_MATCH':
+              // In CLI, we might not have a reference capture mechanism yet, 
+              // but we can at least handle the type if it has an internal analysis.
+              // For now, let's assume it's a passthrough if no ref is provided.
+              break;
+         case 'LUFS_NORMALIZER':
+              current = this.sdk.processLufsNormalize(current, mod.parameters.targetLufs ?? -14);
+              break;
+         case 'ZIG_SATURATION':
+              current = this.sdk.processSaturation(
+                current,
+                mod.parameters.drive ?? 0.5,
+                mod.parameters.type ?? 0,
+                mod.parameters.outputGain ?? 0,
+                mod.parameters.mix ?? 1
+              );
+              break;
+         case 'ZIG_COMPRESSOR':
+              current = this.sdk.processCompressor(current, this.sampleRate, {
+                threshold: mod.parameters.threshold ?? -24,
+                ratio: mod.parameters.ratio ?? 4,
+                attack: mod.parameters.attack ?? 0.01,
+                release: mod.parameters.release ?? 0.1,
+                makeupGain: mod.parameters.makeup ?? 0,
+                mix: mod.parameters.mix ?? 1
+              });
+              break;
+         case 'ZIG_LIMITER':
+              current = this.sdk.processLimiter(current, this.sampleRate, mod.parameters.threshold ?? -6, mod.parameters.release ?? 0.05);
+              break;
+         case 'ZIG_DE_ESSER':
+              current = this.sdk.processDeesser(current, this.sampleRate, {
+                frequency: mod.parameters.frequency ?? 6000,
+                threshold: mod.parameters.threshold ?? -20,
+                ratio: mod.parameters.ratio ?? 4,
+                attack: mod.parameters.attack ?? 0.005,
+                release: mod.parameters.release ?? 0.05
+              });
+              break;
+         case 'ZIG_TRANSIENT_SHAPER':
+              current = this.sdk.processTransientShaper(current, this.sampleRate, {
+                attackGain: mod.parameters.attackGain ?? 0,
+                sustainGain: mod.parameters.sustainGain ?? 0,
+                mix: mod.parameters.mix ?? 1
+              });
+              break;
+         case 'ZIG_BITCRUSHER':
+              current = this.sdk.processBitcrusher(
+                current,
+                mod.parameters.bits ?? 8,
+                mod.parameters.normFreq ?? 1,
+                mod.parameters.mix ?? 1
+              );
+              break;
       }
 
       // Add to cache stack

@@ -7,7 +7,8 @@
 interface ProcessorMessage {
   id: string;
   type: 'NORMALIZE' | 'DC_OFFSET' | 'STRIP_SILENCE' | 'ANALYZE_LUFS' | 'DENOISE' | 
-        'LUFS_NORMALIZE' | 'PHASE_ROTATION' | 'DECLIP' | 'SPECTRAL_DENOISE' | 'MONO_BASS';
+        'LUFS_NORMALIZE' | 'PHASE_ROTATION' | 'DECLIP' | 'SPECTRAL_DENOISE' | 'MONO_BASS' |
+        'VOICE_ISOLATE' | 'TAPE_STABILIZER' | 'ECHO_VANISH' | 'PLOSIVE_GUARD';
   payload: {
     leftChannel: Float32Array;
     rightChannel: Float32Array;
@@ -175,7 +176,30 @@ self.onmessage = async (event: MessageEvent<ProcessorMessage>) => {
       case 'MONO_BASS':
         // process_mono_bass(ptr, len, freq)
         // Uses Interleaved processing
-        wasmBridge.processInterleaved(leftChannel, rightChannel, 'process_mono_bass', params?.freq || 120.0);
+        wasmBridge.processInterleaved(leftChannel, rightChannel, 'process_mono_bass', sampleRate, params?.freq || 120.0);
+        result = { left: leftChannel, right: rightChannel };
+        break;
+
+      case 'VOICE_ISOLATE':
+        wasmBridge.processStereo(leftChannel, rightChannel, 'process_voiceisolate', params?.amount || 0.5);
+        result = { left: leftChannel, right: rightChannel };
+        break;
+
+      case 'TAPE_STABILIZER':
+        // process_tapestabilizer(ptr, len, sr, nominal, min, max, amount)
+        wasmBridge.processStereo(leftChannel, rightChannel, 'process_tapestabilizer', sampleRate, params?.nominal, params?.min, params?.max, params?.amount);
+        result = { left: leftChannel, right: rightChannel };
+        break;
+
+      case 'ECHO_VANISH':
+        // process_echovanish(ptr, len, sr, amount, tail)
+        wasmBridge.processStereo(leftChannel, rightChannel, 'process_echovanish', sampleRate, params?.amount, params?.tailMs);
+        result = { left: leftChannel, right: rightChannel };
+        break;
+
+      case 'PLOSIVE_GUARD':
+        // process_plosiveguard(ptr, len, sr, sensitivity, strength, cutoff)
+        wasmBridge.processStereo(leftChannel, rightChannel, 'process_plosiveguard', sampleRate, params?.sensitivity, params?.strength, params?.cutoff);
         result = { left: leftChannel, right: rightChannel };
         break;
 
