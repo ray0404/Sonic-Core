@@ -3,7 +3,7 @@ import { Box, Text, useApp } from 'ink';
 import SelectInput from 'ink-select-input';
 import { MeterBar } from '../components/MeterBar.js';
 import { useTUIStore } from '../store.js';
-import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.js';
 
 export const MainView = ({ engine }: { engine: SonicEngine }) => {
   const { exit } = useApp();

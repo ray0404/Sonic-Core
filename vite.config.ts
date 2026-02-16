@@ -61,7 +61,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
-        headless: path.resolve(__dirname, 'headless.html'),
       },
       output: {
         manualChunks: {

@@ -7,11 +7,10 @@ import { spawn, ChildProcess } from 'child_process';
 import { 
   SonicEngine, 
   PlaybackState, 
-  MeteringData, 
-  RackModule, 
-  RackModuleType,
-  ProfileAnalyzer
-} from '../../packages/sonic-core/src/index.js';
+  MeteringData
+} from '../../packages/sonic-core/src/engine-interface.js';
+import { RackModule, RackModuleType } from '../../packages/sonic-core/src/types.js';
+import { ProfileAnalyzer } from '../../packages/sonic-core/src/core/profile-analyzer.js';
 import { SonicForgeSDK } from '../../packages/sonic-core/src/sdk.js';
 import { getModuleDescriptors } from '../../packages/sonic-core/src/module-descriptors.js';
 import { encodeWAV } from '../../src/utils/wav-export.js';
@@ -508,14 +507,34 @@ export class NativeEngine implements SonicEngine {
     this.isPlaying = true;
 
     try {
-      // Use aplay with FLOAT_LE format for direct piping of Float32Array
-      this.playbackProcess = spawn('aplay', [
-        '-r', this.sampleRate.toString(),
-        '-c', this.numChannels.toString(),
-        '-f', 'FLOAT_LE',
-        '-t', 'raw',
-        '--buffer-time', '200000' // 200ms buffer to reduce underruns
-      ]);
+      // Platform-specific audio output command
+      let command: string;
+      let args: string[];
+
+      if (process.platform === 'darwin') {
+        // macOS: ffplay is the most reliable for raw PCM piping
+        command = 'ffplay';
+        args = [
+          '-f', 'f32le',
+          '-ar', this.sampleRate.toString(),
+          '-ac', this.numChannels.toString(),
+          '-nodisp',
+          '-autoexit',
+          '-i', 'pipe:0'
+        ];
+      } else {
+        // Linux/Default: Use aplay (ALSA)
+        command = 'aplay';
+        args = [
+          '-r', this.sampleRate.toString(),
+          '-c', this.numChannels.toString(),
+          '-f', 'FLOAT_LE',
+          '-t', 'raw',
+          '--buffer-time', '200000' // 200ms buffer to reduce underruns
+        ];
+      }
+
+      this.playbackProcess = spawn(command, args);
 
       if (this.playbackProcess.stdin) {
         this.playbackProcess.stdin.on('error', (err: any) => {

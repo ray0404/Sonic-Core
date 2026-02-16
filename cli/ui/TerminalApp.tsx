@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Box, useInput, useApp } from 'ink';
-import { SonicEngine } from '../../packages/sonic-core/src/index.js';
+import { SonicEngine } from '../../packages/sonic-core/src/engine-interface.js';
 import { useTUIStore } from './store.js';
 
 // Import Views

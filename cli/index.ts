@@ -19,7 +19,8 @@ program
 function getWasmPath() {
     const isRunningFromDist = __dirname.includes(path.join('dist', 'cli'));
     if (isRunningFromDist) {
-        return path.resolve(__dirname, '..', 'wasm', 'dsp.wasm');
+        // Prefer the localized WASM copied during build:cli
+        return path.resolve(__dirname, 'wasm', 'dsp.wasm');
     } else {
         return path.resolve(__dirname, '..', 'public', 'wasm', 'dsp.wasm');
     }

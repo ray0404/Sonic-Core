@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Text, useInput } from 'ink';
 import SelectInput from 'ink-select-input';
 import { useTUIStore } from '../store.js';
-import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.js';
 
 export const RackView = ({ engine }: { engine: SonicEngine }) => {
   const { rack, metering, setView, setSelectedModuleId } = useTUIStore();

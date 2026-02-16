@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { useTUIStore } from '../store.js';
-import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.js';
 
 export const ModuleEditView = ({ engine }: { engine: SonicEngine }) => {
   const { rack, selectedModuleId, setView, moduleDescriptors, metering } = useTUIStore();
