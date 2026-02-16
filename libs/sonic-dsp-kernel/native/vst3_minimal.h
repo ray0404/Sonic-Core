@@ -33,6 +33,7 @@ namespace Steinberg {
         virtual int32 SMTG_STDCALL queryInterface(const TUID _iid, void** obj) = 0;
         virtual uint32 SMTG_STDCALL addRef() = 0;
         virtual uint32 SMTG_STDCALL release() = 0;
+        static const TUID iid;
     };
 
     const int32 kResultOk = 0;
@@ -152,7 +153,6 @@ namespace Steinberg {
             virtual void* SMTG_STDCALL createView(const char* name) = 0;
             static const TUID iid;
         };
-    }
 
         // IComponent
         class IComponent : public FUnknown {

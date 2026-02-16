@@ -123,6 +123,11 @@ blueprints/
 conductor/
 .firebase/
 
+# Zig Build Artifacts
+libs/sonic-dsp-kernel/.zig-cache/
+libs/sonic-dsp-kernel/zig-out/
+libs/sonic-dsp-kernel/plugin_entry.zig
+
 # Generated Documentation
 public/docs/
 GEMINI.md

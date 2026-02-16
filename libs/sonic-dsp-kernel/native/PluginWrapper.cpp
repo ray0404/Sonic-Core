@@ -158,8 +158,6 @@ public:
 
     // --- IEditController ---
     tresult SMTG_STDCALL setComponentState(void* state) override { return kResultOk; }
-    tresult SMTG_STDCALL setState(void* state) override { return kResultOk; }
-    tresult SMTG_STDCALL getState(void* state) override { return kResultOk; }
     int32 SMTG_STDCALL getParameterCount() override { return 16; } // Support up to 16 generic params
     tresult SMTG_STDCALL getParameterInfo(int32 paramIndex, ParameterInfo& info) override {
         if (paramIndex >= 16) return kResultFalse;

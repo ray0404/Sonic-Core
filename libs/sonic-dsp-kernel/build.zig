@@ -1,7 +1,7 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    const target = b.option([]const u8, "target", "Target triple (e.g., x86_64-windows-gnu, aarch64-macos)") orelse b.standardTargetOptions(.{});
+    const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
     // --- Options ---
@@ -15,29 +15,45 @@ pub fn build(b: *std.Build) void {
     const lower_name = std.ascii.lowerString(buffer[0..plugin_name.len], plugin_name);
     
     const plugin_path_str = b.fmt("plugins/{s}.zig", .{lower_name});
-    const plugin_path = b.path(plugin_path_str);
+
+    // Generate a bridge file in the root to allow relative imports to work
+    // from the project root instead of from the plugins/ directory.
+    const entry_content = b.fmt("pub const plugin_impl = @import(\"{s}\").plugin_impl;\n", .{plugin_path_str});
+    std.fs.cwd().writeFile(.{ .sub_path = "plugin_entry.zig", .data = entry_content }) catch {};
 
     const plugin_mod = b.createModule(.{
-        .root_source_file = plugin_path,
+        .root_source_file = b.path("plugin_entry.zig"),
+        .pic = true,
     });
 
     // --- Static Library (Zig DSP Kernel) ---
     // This compiles the Zig code into a static lib that C++ can link against.
-    const lib = b.addStaticLibrary(.{
-        .name = "dsp_kernel",
+    const lib_mod = b.createModule(.{
         .root_source_file = b.path("c_export.zig"),
         .target = target,
         .optimize = optimize,
+        .pic = true,
     });
-    lib.root_module.addImport("plugin_impl", plugin_mod);
+    lib_mod.addImport("plugin_impl", plugin_mod);
+
+    const lib = b.addLibrary(.{
+        .linkage = .static,
+        .name = "dsp_kernel",
+        .root_module = lib_mod,
+    });
     
     const lib_install = b.addInstallArtifact(lib, .{});
     
     // --- VST3 Shared Library (Native Wrapper) ---
-    const vst3_lib = b.addSharedLibrary(.{
+    const vst3_lib = b.addLibrary(.{
+        .linkage = .dynamic,
         .name = plugin_name,
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+            .link_libcpp = true,
+        }),
     });
     
     vst3_lib.addCSourceFile(.{
@@ -56,10 +72,15 @@ pub fn build(b: *std.Build) void {
     plugin_step.dependOn(&vst3_install.step);
 
     // --- AU Shared Library (Native Wrapper) ---
-    const au_lib = b.addSharedLibrary(.{
+    const au_lib = b.addLibrary(.{
+        .linkage = .dynamic,
         .name = plugin_name, // Result: lib{name}.dylib
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+            .link_libcpp = true,
+        }),
     });
 
     au_lib.addCSourceFile(.{
