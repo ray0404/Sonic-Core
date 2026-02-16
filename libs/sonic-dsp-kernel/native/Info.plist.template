@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>{{BINARY_NAME}}</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.sonicpress.audiounit.{{PLUGIN_NAME}}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>{{PLUGIN_NAME}}</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
+	<key>AudioComponents</key>
+	<array>
+		<dict>
+			<key>type</key>
+			<string>aufx</string>
+			<key>subtype</key>
+			<string>sncp</string>
+			<key>manufacturer</key>
+			<string>SNCP</string>
+			<key>name</key>
+			<string>SonicPress: {{PLUGIN_NAME}}</string>
+			<key>version</key>
+			<integer>65536</integer>
+			<key>factoryFunction</key>
+			<string>SonicPluginFactory</string>
+		</dict>
+	</array>
+</dict>
+</plist>
