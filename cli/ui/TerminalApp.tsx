@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Box, useInput, useApp } from 'ink';
-import { AudioBridge } from '../engine/audio-bridge.js';
+import { SonicEngine } from '../../packages/sonic-core/src/index.js';
 import { useTUIStore } from './store.js';
 
 // Import Views
@@ -11,7 +11,7 @@ import { ModuleEditView } from './views/ModuleEditView.js';
 import { LoadFileView } from './views/LoadFileView.js';
 import { ExportView } from './views/ExportView.js';
 
-export const TerminalApp = ({ bridge }: { bridge: AudioBridge }) => {
+export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
   const { view, setView, setRack, setPlayback, setMessage, setModuleDescriptors, playback } = useTUIStore();
   const { exit } = useApp();
 
@@ -20,9 +20,9 @@ export const TerminalApp = ({ bridge }: { bridge: AudioBridge }) => {
     const syncInitialState = async () => {
       try {
         const [initialRack, initialPlayback, descriptors] = await Promise.all([
-          bridge.getRack(),
-          bridge.getPlaybackState(),
-          bridge.getModuleDescriptors(),
+          engine.getRack(),
+          engine.getPlaybackState(),
+          engine.getModuleDescriptors(),
         ]);
         
         setRack(initialRack || []);
@@ -34,7 +34,7 @@ export const TerminalApp = ({ bridge }: { bridge: AudioBridge }) => {
       }
     };
     syncInitialState();
-  }, [bridge, setRack, setPlayback, setMessage, setModuleDescriptors]);
+  }, [engine, setRack, setPlayback, setMessage, setModuleDescriptors]);
 
   // Global Shortcuts
   useInput(async (input, key) => {
@@ -51,7 +51,7 @@ export const TerminalApp = ({ bridge }: { bridge: AudioBridge }) => {
 
       // Play/Pause - Global
       if (input === ' ') {
-          await bridge.togglePlay();
+          await engine.togglePlay();
           return;
       }
 
@@ -72,14 +72,14 @@ export const TerminalApp = ({ bridge }: { bridge: AudioBridge }) => {
 
       // Transport
       if (input === 's') { // Stop
-          if (playback.isPlaying) await bridge.togglePlay();
-          await bridge.seek(0);
+          if (playback.isPlaying) await engine.togglePlay();
+          await engine.seek(0);
       }
       if (input === ',') { // Rewind
-          await bridge.seek(Math.max(0, playback.currentTime - 5));
+          await engine.seek(Math.max(0, playback.currentTime - 5));
       }
       if (input === '.') { // Forward
-          await bridge.seek(Math.min(playback.duration, playback.currentTime + 5));
+          await engine.seek(Math.min(playback.duration, playback.currentTime + 5));
       }
 
       // Navigation
@@ -99,18 +99,18 @@ export const TerminalApp = ({ bridge }: { bridge: AudioBridge }) => {
   const renderView = () => {
     switch (view) {
       case 'RACK':
-        return <RackView bridge={bridge} />;
+        return <RackView engine={engine} />;
       case 'ADD_MODULE':
-        return <AddModuleView bridge={bridge} />;
+        return <AddModuleView engine={engine} />;
       case 'MODULE_EDIT':
-        return <ModuleEditView bridge={bridge} />;
+        return <ModuleEditView engine={engine} />;
       case 'LOAD_FILE':
-        return <LoadFileView bridge={bridge} />;
+        return <LoadFileView engine={engine} />;
       case 'EXPORT':
-        return <ExportView bridge={bridge} />;
+        return <ExportView engine={engine} />;
       case 'MAIN':
       default:
-        return <MainView bridge={bridge} />;
+        return <MainView engine={engine} />;
     }
   };
 

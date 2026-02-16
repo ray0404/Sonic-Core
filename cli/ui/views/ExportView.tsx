@@ -3,7 +3,7 @@ import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
 import Spinner from 'ink-spinner';
 import { useTUIStore } from '../store.js';
-import { AudioBridge } from '../../engine/audio-bridge.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
 import path from 'path';
 
 const InputListener = ({ onEsc }: { onEsc: () => void }) => {
@@ -13,7 +13,7 @@ const InputListener = ({ onEsc }: { onEsc: () => void }) => {
   return null;
 };
 
-export const ExportView = ({ bridge }: { bridge: AudioBridge }) => {
+export const ExportView = ({ engine }: { engine: SonicEngine }) => {
   const { isExporting, setIsExporting, message, setMessage, setView } = useTUIStore();
   const [exportPath, setExportPath] = React.useState('output.wav');
 
@@ -22,7 +22,7 @@ export const ExportView = ({ bridge }: { bridge: AudioBridge }) => {
       setMessage('Rendering offline... please wait.');
       try {
           const target = path.isAbsolute(pathStr) ? pathStr : path.resolve(process.cwd(), pathStr);
-          await bridge.exportAudio(target);
+          await engine.exportAudio(target);
           setMessage(`Success! Saved to: ${target}`, 2500);
           setView('MAIN');
       } catch (e: any) {

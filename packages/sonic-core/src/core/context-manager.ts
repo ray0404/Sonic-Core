@@ -1,6 +1,6 @@
 import { AudioContext, IAudioContext, IOfflineAudioContext } from "standardized-audio-context";
-import { logger } from "@/utils/logger";
-import { WorkletProvider } from "./types";
+import { logger } from "@/utils/logger.js";
+import { WorkletProvider } from "./types.js";
 
 export class ContextManager {
   private static _context: IAudioContext | null = null;
@@ -30,7 +30,7 @@ export class ContextManager {
       if (ctx.audioWorklet) {
           try {
             const urls = provider.getModuleUrls();
-            await Promise.all(urls.map(url => ctx.audioWorklet!.addModule(url)));
+            await Promise.all(urls.map((url: string) => ctx.audioWorklet!.addModule(url)));
             logger.info("AudioWorklet modules loaded successfully.");
           } catch (err) {
             logger.error(`Failed to load AudioWorklet modules`, err);

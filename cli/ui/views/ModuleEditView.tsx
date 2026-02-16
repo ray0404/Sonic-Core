@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { useTUIStore } from '../store.js';
-import { AudioBridge } from '../../engine/audio-bridge.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
 
-export const ModuleEditView = ({ bridge }: { bridge: AudioBridge }) => {
+export const ModuleEditView = ({ engine }: { engine: SonicEngine }) => {
   const { rack, selectedModuleId, setView, moduleDescriptors, metering } = useTUIStore();
   const module = rack.find(m => m.id === selectedModuleId);
   const meter = metering.rack[module?.id || ''];
@@ -28,7 +28,7 @@ export const ModuleEditView = ({ bridge }: { bridge: AudioBridge }) => {
   };
 
   const onDelete = async () => {
-    await bridge.removeModule(module.id);
+    await engine.removeModule(module.id);
     setView('RACK');
   };
 
@@ -47,7 +47,7 @@ export const ModuleEditView = ({ bridge }: { bridge: AudioBridge }) => {
                 const currentParam = params[selectedParamIdx];
                 const range = getParamRange(currentParam);
                 const clamped = Math.max(range.min, Math.min(range.max, val));
-                bridge.updateParam(module.id, currentParam, clamped).catch(() => {});
+                engine.updateParam(module.id, currentParam, clamped).catch(() => {});
             }
             setIsEditing(false);
             return;
@@ -101,7 +101,7 @@ export const ModuleEditView = ({ bridge }: { bridge: AudioBridge }) => {
         newVal = Math.max(range.min, Math.min(range.max, newVal));
 
         if (newVal !== val) {
-            bridge.updateParam(module.id, currentParam, newVal).catch(() => {});
+            engine.updateParam(module.id, currentParam, newVal).catch(() => {});
         }
     } else {
         // Delete Button
@@ -111,7 +111,7 @@ export const ModuleEditView = ({ bridge }: { bridge: AudioBridge }) => {
     }
     
     if (input === 'b') {
-        bridge.toggleModuleBypass(module.id).catch(() => {});
+        engine.toggleModuleBypass(module.id).catch(() => {});
     }
   });
 

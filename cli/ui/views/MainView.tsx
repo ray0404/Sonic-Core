@@ -3,9 +3,9 @@ import { Box, Text, useApp } from 'ink';
 import SelectInput from 'ink-select-input';
 import { MeterBar } from '../components/MeterBar.js';
 import { useTUIStore } from '../store.js';
-import { AudioBridge } from '../../engine/audio-bridge.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
 
-export const MainView = ({ bridge }: { bridge: AudioBridge }) => {
+export const MainView = ({ engine }: { engine: SonicEngine }) => {
   const { exit } = useApp();
   const { playback, metering, message, setView } = useTUIStore();
 
@@ -23,17 +23,17 @@ export const MainView = ({ bridge }: { bridge: AudioBridge }) => {
   const handleSelect = async (item: any) => {
     if (item.value === 'EXIT') exit();
     else if (item.value === 'TOGGLE_PLAY') {
-      await bridge.togglePlay();
+      await engine.togglePlay();
     }
     else if (item.value === 'STOP') {
-      if (playback.isPlaying) await bridge.togglePlay();
-      await bridge.seek(0);
+      if (playback.isPlaying) await engine.togglePlay();
+      await engine.seek(0);
     }
     else if (item.value === 'REWIND') {
-      await bridge.seek(Math.max(0, playback.currentTime - 5));
+      await engine.seek(Math.max(0, playback.currentTime - 5));
     }
     else if (item.value === 'FORWARD') {
-      await bridge.seek(Math.min(playback.duration, playback.currentTime + 5));
+      await engine.seek(Math.min(playback.duration, playback.currentTime + 5));
     }
     else {
       setView(item.value);

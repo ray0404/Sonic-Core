@@ -8,7 +8,13 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@sonic-core/*": ["packages/sonic-core/src/*"],
+      "@sonic-core": ["packages/sonic-core/src/index.ts"]
+    }
   },
   "include": ["cli"]
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
 import { useTUIStore } from '../store.js';
-import { AudioBridge } from '../../engine/audio-bridge.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -13,7 +13,7 @@ const InputListener = ({ onEsc }: { onEsc: () => void }) => {
   return null;
 };
 
-export const LoadFileView = ({ bridge }: { bridge: AudioBridge }) => {
+export const LoadFileView = ({ engine }: { engine: SonicEngine }) => {
   const { message, setMessage, setView } = useTUIStore();
   const [filePath, setFilePath] = React.useState('');
 
@@ -22,7 +22,7 @@ export const LoadFileView = ({ bridge }: { bridge: AudioBridge }) => {
     try {
       if (!fs.existsSync(pathStr)) throw new Error('File not found');
       const buffer = fs.readFileSync(pathStr);
-      await bridge.loadAudio(buffer);
+      await engine.loadAudio(buffer);
       setMessage(`Loaded: ${path.basename(pathStr)}`, 1500);
       setView('MAIN');
     } catch (e: any) {

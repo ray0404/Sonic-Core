@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Text, useInput } from 'ink';
 import SelectInput from 'ink-select-input';
 import { useTUIStore } from '../store.js';
-import { AudioBridge } from '../../engine/audio-bridge.js';
+import { SonicEngine } from '../../../packages/sonic-core/src/index.js';
 
-export const RackView = ({ bridge }: { bridge: AudioBridge }) => {
+export const RackView = ({ engine }: { engine: SonicEngine }) => {
   const { rack, metering, setView, setSelectedModuleId } = useTUIStore();
   const [highlightedIndex, setHighlightedIndex] = React.useState(0);
   const rackMetering = metering.rack;
@@ -29,16 +29,16 @@ export const RackView = ({ bridge }: { bridge: AudioBridge }) => {
       if (!selectedId || selectedId === 'ADD' || selectedId === 'BACK') return;
 
       if (input === 'b') {
-          await bridge.toggleModuleBypass(selectedId);
+          await engine.toggleModuleBypass(selectedId);
       }
       if (input === 'u' || input === 'U') {
           if (highlightedIndex > 0) {
-               await bridge.reorderRack(highlightedIndex, highlightedIndex - 1);
+               await engine.reorderRack(highlightedIndex, highlightedIndex - 1);
           }
       }
       if (input === 'd' || input === 'D') {
           if (highlightedIndex < rack.length - 1) {
-               await bridge.reorderRack(highlightedIndex, highlightedIndex + 1);
+               await engine.reorderRack(highlightedIndex, highlightedIndex + 1);
           }
       }
   });

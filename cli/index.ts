@@ -1,8 +1,12 @@
+#!/usr/bin/env node
 import { Command } from 'commander';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { AudioBridge } from './engine/audio-bridge.js';
+import { NativeEngine } from './engine/native-engine.js';
 import { runTUI } from './ui/index.js';
+import fs from 'fs';
+import { exportPlugin } from './plugins/export.js';
+import { Director } from './engine/director.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const program = new Command();
@@ -12,6 +16,15 @@ program
   .description('Sonic Forge CLI & TUI')
   .version('0.1.0');
 
+function getWasmPath() {
+    const isRunningFromDist = __dirname.includes(path.join('dist', 'cli'));
+    if (isRunningFromDist) {
+        return path.resolve(__dirname, '..', 'wasm', 'dsp.wasm');
+    } else {
+        return path.resolve(__dirname, '..', 'public', 'wasm', 'dsp.wasm');
+    }
+}
+
 program
   .command('start')
   .description('Start the Interactive TUI')
@@ -19,50 +32,82 @@ program
   .action(async (options) => {
     console.log('Starting Sonic Forge TUI...');
 
-    // Simplified path logic
-    const isRunningFromDist = __dirname.includes(path.join('dist', 'cli'));
-    // If running from dist/cli/index.js, the headless file is in dist/cli/headless.html (or dist/headless.html copied there)
-    // If running via tsx from cli/index.ts, the built headless file is in dist/headless.html
-    
-    let staticDir: string;
-    let fileName = 'headless.html';
+    const wasmPath = getWasmPath();
 
-    if (isRunningFromDist) {
-        // We are in dist/cli. We want to serve dist/ which is one level up.
-        staticDir = path.resolve(__dirname, '..');
-    } else {
-        // We are in cli/. We want to serve dist/ which is ../dist
-        staticDir = path.resolve(__dirname, '..', 'dist');
-    }
-
-    const headlessPath = path.join(staticDir, fileName);
-
-    // Verify existence
-    const fs = await import('fs');
-    if (!fs.existsSync(headlessPath)) {
-        console.error(`Error: Could not find headless engine at "${headlessPath}".`);
-        if (!isRunningFromDist) {
-            console.error('Hint: You might need to run "npm run build" first.');
-        }
+    if (!fs.existsSync(wasmPath)) {
+        console.error(`Error: Could not find DSP WASM at "${wasmPath}".`);
+        console.error('Hint: You might need to run "npm run build:wasm" first.');
         process.exit(1);
     }
 
     try {
-      // 1. Launch the Headless Bridge with static serving
-      const bridge = new AudioBridge(staticDir, fileName, options.debug);
-      await bridge.init();
+      const engine = new NativeEngine(wasmPath);
+      await engine.init();
       if (options.debug) console.log('Engine Connected.');
 
-      // 2. Launch TUI
-      await runTUI(bridge);
+      await runTUI(engine);
 
-      // Cleanup on exit
-      await bridge.close();
+      await engine.close();
       process.exit(0);
 
     } catch (error) {
       console.error('Fatal Error:', error);
       process.exit(1);
+    }
+  });
+
+program
+  .command('director')
+  .description('Batch process audio files using a .sonic manifest')
+  .argument('<manifest>', 'Path to .sonic manifest file (JSON)')
+  .argument('<input>', 'Input directory')
+  .argument('<output>', 'Output directory')
+  .option('-p, --parallel <number>', 'Number of parallel workers', '4')
+  .action(async (manifestPath, inputDir, outputDir, options) => {
+    console.log(`Director: Batch processing from ${inputDir} to ${outputDir}...`);
+    
+    const wasmPath = getWasmPath();
+    if (!fs.existsSync(wasmPath)) {
+        console.error(`Error: Could not find DSP WASM at "${wasmPath}".`);
+        process.exit(1);
+    }
+
+    if (!fs.existsSync(manifestPath)) {
+        console.error(`Error: Manifest file not found at "${manifestPath}".`);
+        process.exit(1);
+    }
+
+    try {
+        const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+        const director = new Director(wasmPath);
+        
+        const results = await director.processBatch({
+            inputDir,
+            outputDir,
+            manifest,
+            parallel: parseInt(options.parallel)
+        });
+
+        console.log('\nBatch Processing Complete:');
+        const successful = results.filter(r => r.success).length;
+        const failed = results.filter(r => !r.success).length;
+        
+        console.log(`- Total: ${results.length}`);
+        console.log(`- Success: ${successful}`);
+        console.log(`- Failed: ${failed}`);
+
+        if (failed > 0) {
+            console.log('\nErrors:');
+            results.filter(r => !r.success).forEach(r => {
+                console.log(`  - ${path.basename(r.inputPath)}: ${r.error}`);
+            });
+            process.exit(1);
+        }
+        process.exit(0);
+
+    } catch (error) {
+        console.error('Director Error:', error);
+        process.exit(1);
     }
   });
 
@@ -98,6 +143,45 @@ modulesCommand
   .action(() => {
     console.log('Available SonicForge Modules:');
     modules.forEach(m => console.log(`- ${m}`));
+  });
+
+const exportCommand = program.command('export')
+  .description('Export DSP modules as native plugin formats (VST3, AU)');
+
+exportCommand
+  .command('vst3')
+  .description('Export as VST3 plugin')
+  .option('-p, --plugin <id>', 'Plugin ID to export', 'gain')
+  .option('-o, --output <path>', 'Output directory', 'dist/plugins')
+  .option('-t, --target <arch>', 'Target architecture (x86_64, aarch64)', '')
+  .action(async (options) => {
+    console.log('Building VST3 plugin...');
+    await exportPlugin({
+      format: 'vst3',
+      plugin: options.plugin,
+      output: options.output,
+      target: options.target
+    });
+  });
+
+exportCommand
+  .command('au')
+  .description('Export as Audio Unit plugin (macOS only)')
+  .option('-p, --plugin <id>', 'Plugin ID to export', 'gain')
+  .option('-o, --output <path>', 'Output directory', 'dist/plugins')
+  .option('-t, --target <arch>', 'Target architecture (aarch64, x86_64)', '')
+  .action(async (options) => {
+    if (process.platform !== 'darwin') {
+      console.error('Audio Units can only be built on macOS');
+      process.exit(1);
+    }
+    console.log('Building Audio Unit plugin...');
+    await exportPlugin({
+      format: 'au',
+      plugin: options.plugin,
+      output: options.output,
+      target: options.target
+    });
   });
 
 program.parse();

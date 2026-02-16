@@ -1,4 +1,4 @@
-import { RackModule, RackModuleType } from "../types";
+import { RackModule, RackModuleType } from "../types.js";
 
 export const createDefaultModule = (type: RackModuleType, id?: string): RackModule => {
     let params: any = {};
@@ -32,6 +32,7 @@ export const createDefaultModule = (type: RackModuleType, id?: string): RackModu
 
     return {
         id: id || crypto.randomUUID(),
+        name: type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
         type,
         bypass: false,
         parameters: params
