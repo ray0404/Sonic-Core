@@ -1,74 +1,83 @@
-# Gemini Added Memories
-**Common Credentials:**
-- My email is: ray.valentin.04@gmail.com
+# Sonic-Core: Universal Audio Platform
 
-**Directives:**
-- When utilizing `conductor` extension, **DO NOT** add `conductor/` directory to repo; add to .gitignore immediatley upon creation; keep local *only* throughout any/all processes
-- When starting a *new* session: assess whether or not gemini-cli has proper project context loaded/cached. If context amount/quality is questionable (or if it is a brand new session--or session has 95% or more 'context' remaining), analyze the project/repo using codebase investigator agent to gain adequate project context, priming AI model for project updates
-- Utilize web_search tool liberally; when unsure about a process/debug/optimization/etc., run (1-3) web search(es) in order to gain additional context/info to aid in assisting user with development-based processes and/or queries
+**Sonic-Core** is a high-performance, professional-grade audio processing platform. It is designed as a modular system that bridges web-based convenience with desktop-level DSP performance.
 
-***
+## 🚀 Project Overview
 
-# Gemini CLI Directives
-This section details how Gemini CLI (you) are to read, understand, and/or process this (and any other) GEMINI.md file and its contents, for global and/or directory specific context and/or instructions, respectiveley.
+Sonic-Core transforms the concept of a "web-based DAW" into a **Universal Audio Platform**. It consists of a headless core library, a rich web interface, and a powerful CLI toolset.
 
-## How to Interpret
-Independent 'sections' of GEMINI.md are separated by (nested between) triple-asterisks ("***") that begin on a new line; each section will have its own header 1 (h1) and its end (and start of new/next section) is denoted by aforementioned triple-asterisks. Each sections (h1) is to be interpreted as its literal denotation, to the best of your (Gemini's) ability. For sections whose header 1 (h1) begin as 'Persona' or 'Context' (or 'Gemini Context'), refer to the following similarly labeled (h3) parts of this section for additional, specific interpretation directives.
+### Core Technology Stack
+- **Engine Core**: TypeScript 5.x (Headless, Command-driven)
+- **DSP Kernel**: Zig 0.13.0 (Compiled to WebAssembly)
+- **Web UI**: React 18, Zustand, Tailwind CSS, Vite
+- **CLI/TUI**: Ink (React for CLI), Puppeteer (Headless Audio Context)
+- **Real-time Processing**: AudioWorklets
+- **Offline Processing**: Web Workers + WASM
+- **Testing**: Vitest
 
-### Persona
-- Any section whose header 1 (h1—#) begins with 'Persona', is to be treated as agent or "bot-like" instructions; specific instructions on how to behave, respond, communicate, interact, process, etc..
-- Persona's **MUST** be explicitly *toggled on*/enabled, with a phrase such as, "act as VibeCoder", "execute VibeCoder persona", "persona: VibeCoder", "as 'VibeCoder', do process...", "start `VibeCoder`", etc..
-- Whenever a persona is *active*, this must be *explicitly* denoted atop start of replies and/or prefixing status message's, etc..
-- Personas must be manually *toggled off*/stopped, **unless** user specifies to AI/ agent to only take on persona for one/that turn (or any exact user specified amount of turns).
+## 🏗️ Architecture: The Three-Layer System
 
-***
+Sonic-Core follows a strict architectural boundary to manage audio thread safety and cross-platform compatibility.
 
-# Persona: VibeCoder
+### 1. Intent Layer (UI & Store)
+*   **Path**: `src/`
+*   **Role**: Visualizes state and captures user intent. It is decoupled from direct audio buffer manipulation.
+*   **State Management**: Zustand handles the project graph (tracks, modules, parameters).
+*   **Persistence**: Automatic hydration/dehydration to IndexedDB via `idb-keyval`.
 
-## ROLE & GOAL
-You are an expert AI Full-Stack & DevOps Architect. Your primary goal is to be a hyper-competent assistant who seamlessly bridges the gap between local development ("vibe coding") and successful production deployment. You are a partner who not only helps write the code but also ensures it gets online successfully and reliably on platforms like Replit and Google Cloud (specifically Firebase Hosting). Your defining principle is to **understand before you act**.
+### 2. Orchestration Layer (Mixer Engine)
+*   **Path**: `packages/sonic-core/`
+*   **Role**: Translates user intents (Commands) into imperative Web Audio API calls.
+*   **Protocol**: Uses a serialized `EngineCommand` protocol (`TRACK_ADD`, `PARAM_SET`, etc.) to control the engine.
+*   **SDK**: Provides a headless bridge for the Zig/WASM DSP kernel.
 
-## CORE DIRECTIVES
-1.  **Mandate for Holistic Contextual Analysis**: Before providing any code, configuration, or structural advice, you MUST first perform and state a brief analysis of the project. This is a **non-negotiable first step**. Your analysis must summarize:
-    * **The Project's Apparent Goal**: What does the application do? (e.g., "This appears to be a React-based e-commerce front-end that communicates with a headless CMS.")
-    * **The Core Technology Stack**: What are the key languages, frameworks, and major libraries? (e.g., "The stack is TypeScript, Next.js, and Tailwind CSS, with dependencies managed by npm.")
-    * **The Existing Architecture**: How is the project organized? (e.g., "The project follows a feature-sliced design, with components, services, and hooks co-located by feature.")
-    This mandatory step forces you to synthesize context from the entire repository, preventing simple but costly errors that arise from isolated, context-free changes. **DO NOT provide code or commands until you have stated this analysis.**
+### 3. Processing Layer (DSP)
+*   **Real-time**: Pure JavaScript/TypeScript `AudioWorkletProcessors` located in `packages/sonic-core/src/worklets/`.
+*   **Offline**: High-performance Zig kernels in `libs/sonic-dsp-kernel/`.
+*   **WASM Bridge**: The `SonicForgeSDK` manages memory allocation and data transfer between JavaScript and the compiled Zig binary.
 
-2.  **Project Context is King**: ALWAYS prioritize the provided Git repository context (`--context "git:."`) to inform your answers. Your analysis MUST include looking for deployment-related configuration files (`firebase.json`, `.replit`, `replit.nix`, `Dockerfile`, `cloudbuild.yaml`, etc.). Your suggestions must be tailored to the project's existing stack, dependencies, and architecture.
+## 🛠️ Key Components & Features
 
-3.  **Deployment-First Mindset**: For any coding task, proactively consider the deployment implications. If a user asks for a new feature, you might also suggest how to handle necessary environment variables or update build configurations. Your job is to help the user think like a DevOps professional.
+### The DSP Library
+Over 30 professional-grade processors including:
+- **Intelligent Repair**: De-Clipper, Spectral Denoise, Plosive Guard.
+- **Mastering Tools**: LUFS Normalizer, Phase Rotation, Smart Level.
+- **Creative Effects**: Multi-mode Saturation, BitCrusher, Feedback Delay, Chorus.
+- **Advanced Isolation**: Voice Isolate, De-Bleed, Spectral Match.
 
-***
+### The "Director" System
+A manifest-based batch processing engine (`cli/engine/director.ts`) that allows automating complex audio workflows across thousands of files via the CLI.
 
-# Gemini Context: Sonic Forge Architecture
+### Native Plugin Export
+A dedicated wrapper system that allows exporting Sonic-Core DSP logic as native VST3 or Audio Unit (AU) plugins.
 
-This project is a high-performance audio processing platform.
+## 🚦 Building and Running
 
-## Audio Engine Architecture
-1.  **Sonic-Core SDK**: Headless audio engine managing the Web Audio graph and worklet connections.
-2.  **Zig DSP Kernel**: Low-level signal processing compiled to WASM for high performance.
-3.  **Trinity Pattern**: Adding effects requires a Processor (DSP), a Node (JS/TS Wrapper), and a UI Component (React).
+### Prerequisites
+- **Node.js**: 18.0+
+- **Zig**: 0.13.0 (Required for WASM builds)
+- **Chromium**: Required for the headless CLI engine
 
-## Deployment Pattern
-- **Firebase Hosting**: Primary deployment target.
-- **WASM Management**: `npm run build:wasm` must be run before development or deployment to ensure the latest DSP logic is available in `public/wasm/`.
+### Key Commands
+| Command | Description |
+|---------|-------------|
+| `npm run build:wasm` | Compiles Zig DSP kernel to `public/wasm/dsp.wasm` |
+| `npm run dev` | Starts the Vite development server for the Web App |
+| `npm run build` | Builds the production Web App bundle |
+| `npm run dev:cli` | Starts the interactive React-based CLI (TUI) |
+| `npm run build:cli` | Compiles the CLI application for distribution |
+| `npm test` | Runs the Vitest suite (Unit & Integration) |
 
-## CLI Tooling
-- **Director**: Batch processing tool using the `NativeEngine` to process files according to a manifest.
-- **Export**: Generates native VST3/AU wrappers using the Zig build system.
+## 📏 Development Conventions
 
-***
+### The "Trinity Pattern"
+To add a new real-time effect, you must implement:
+1.  **DSP Processor**: `packages/sonic-core/src/worklets/[name]-processor.js`
+2.  **Node Wrapper**: `packages/sonic-core/src/worklets/[Name]Node.ts`
+3.  **UI Unit**: `src/components/rack/[Name]Unit.tsx`
 
-# Gemini Context: repomix
+### Headless First
+All engine logic must reside in `packages/sonic-core` and remain independent of React or browser-specific globals (except the Web Audio API). Environment-specific dependencies (like file paths) should be injected via providers.
 
-## 🚀 Session Priming
-When you need to "prime" your context, use:
-```bash
-repomix --stdout
-```
-
-For remote analysis:
-```bash
-repomix --remote <owner>/<repo> --stdout
-```
+---
+*Last Updated: February 2026*

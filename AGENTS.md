@@ -1,10 +1,10 @@
-# Sonic Forge - Agent Operational Guide
+# Sonic-Core - Agent Operational Guide
 
-This document provides a comprehensive overview of the Sonic Forge codebase, architecture, and operational procedures for AI agents and developers.
+This document provides a comprehensive overview of the Sonic-Core codebase, architecture, and operational procedures for AI agents and developers.
 
 ## 1. Project Identity & Purpose
 
-*   **Name:** Sonic Forge
+*   **Name:** Sonic-Core
 *   **Description:** A professional-grade, local-first Progressive Web App (PWA) for audio mastering and processing. It bridges the gap between browser-based tools and desktop DAWs.
 *   **Core Philosophy:**
     *   **Zero-Latency:** Real-time processing via AudioWorklets.
@@ -37,7 +37,7 @@ This document provides a comprehensive overview of the Sonic Forge codebase, arc
 
 ## 3. Architecture Overview
 
-Sonic Forge follows a strict **Three-Layer Architecture**:
+Sonic-Core follows a strict **Three-Layer Architecture**:
 
 1.  **Intent Layer (UI & Store):**
     *   **Role:** Captures user actions and manages application state.
