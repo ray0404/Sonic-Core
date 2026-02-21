@@ -12,6 +12,27 @@
   </head>
   <body class="bg-background text-slate-200 antialiased overflow-hidden">
     <div id="root" class="h-screen w-screen flex flex-col"></div>
+    <script>
+      window.onerror = function(message, source, lineno, colno, error) {
+        const root = document.getElementById('root');
+        if (root && root.childElementCount === 0) {
+           const errDiv = document.createElement('div');
+           errDiv.style.position = 'fixed';
+           errDiv.style.top = '0';
+           errDiv.style.left = '0';
+           errDiv.style.width = '100%';
+           errDiv.style.height = '100%';
+           errDiv.style.backgroundColor = '#000';
+           errDiv.style.color = '#f00';
+           errDiv.style.padding = '20px';
+           errDiv.style.zIndex = '9999';
+           errDiv.style.whiteSpace = 'pre-wrap';
+           errDiv.style.fontFamily = 'monospace';
+           errDiv.innerText = 'Global Error:\n' + message + '\nAt: ' + source + ':' + lineno + ':' + colno + '\n' + (error ? error.stack : '');
+           document.body.appendChild(errDiv);
+        }
+      };
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
