@@ -24,6 +24,25 @@ export const makeTubeCurve = (amount: number): any => {
 };
 
 /**
+ * Converts a linear amplitude value to decibels.
+ * @param linear - Linear amplitude (0 to 1+)
+ * @returns Value in dB (-100 to 0+)
+ */
+export const linearToDb = (linear: number): number => {
+  if (linear <= 0.0000000001) return -100;
+  return 20 * Math.log10(linear);
+};
+
+/**
+ * Converts a decibel value to linear amplitude.
+ * @param db - Value in dB
+ * @returns Linear amplitude
+ */
+export const dbToLinear = (db: number): number => {
+  return Math.pow(10, db / 20);
+};
+
+/**
  * Generates a hard clipping fuzz distortion curve.
  * @param amount - The intensity of the fuzz effect.
  * @returns A Float32Array representing the wave shaping curve.

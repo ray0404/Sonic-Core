@@ -7,7 +7,9 @@ export async function initProcessor() {
     if (sdk) return sdk;
 
     // 1. Load WASM via Fetch (Browser specific)
-    const response = await fetch('/wasm/dsp.wasm');
+    const baseUrl = (import.meta as any).env?.BASE_URL || '/';
+    const wasmPath = `${baseUrl}wasm/dsp.wasm`.replace(/\/+/g, '/');
+    const response = await fetch(wasmPath);
     const bytes = await response.arrayBuffer();
     
     sdk = new SonicForgeSDK(bytes);

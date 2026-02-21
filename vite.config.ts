@@ -83,6 +83,10 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
-    include: ['src/**/*.{test,spec}.{ts,tsx,js,jsx}', 'packages/sonic-core/src/**/*.{test,spec}.{ts,tsx,js,jsx}'],
+    include: [
+      'src/**/*.{test,spec}.{ts,tsx,js,jsx}', 
+      'packages/sonic-core/src/**/*.{test,spec}.{ts,tsx,js,jsx}',
+      'cli/**/*.test.{ts,tsx}'
+    ],
   },
 })

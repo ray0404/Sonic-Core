@@ -7,7 +7,8 @@ import ProcessorWorker from './offline-processor.worker?worker';
 
 export type ProcessType = 'NORMALIZE' | 'DC_OFFSET' | 'STRIP_SILENCE' | 'ANALYZE_LUFS' | 'DENOISE' |
                           'LUFS_NORMALIZE' | 'PHASE_ROTATION' | 'DECLIP' | 'SPECTRAL_DENOISE' | 'MONO_BASS' |
-                          'VOICE_ISOLATE' | 'TAPE_STABILIZER' | 'ECHO_VANISH' | 'PLOSIVE_GUARD';
+                          'VOICE_ISOLATE' | 'TAPE_STABILIZER' | 'ECHO_VANISH' | 'PLOSIVE_GUARD' | 'SPECTRAL_MATCH' |
+                          'PSYCHO_DYNAMIC_EQ' | 'DE_BLEED';
 
 export interface ProcessResult {
   leftChannel: Float32Array;
@@ -116,6 +117,29 @@ export class OfflineProcessorClient {
 
   async removePlosives(left: Float32Array, right: Float32Array, sampleRate: number, sensitivity: number, strength: number, cutoff: number) {
       return this.process('PLOSIVE_GUARD', left, right, sampleRate, { sensitivity, strength, cutoff });
+  }
+
+  /**
+   * Helper to process an AudioBuffer via the worker.
+   */
+  async processAudioBuffer(buffer: AudioBuffer, type: ProcessType, params?: any): Promise<AudioBuffer> {
+      const left = buffer.getChannelData(0).slice();
+      const right = buffer.numberOfChannels > 1 ? buffer.getChannelData(1).slice() : new Float32Array(left.length);
+      
+      const result = await this.process(type, left, right, buffer.sampleRate, params);
+      
+      const newBuffer = new AudioBuffer({
+          length: buffer.length,
+          numberOfChannels: buffer.numberOfChannels,
+          sampleRate: buffer.sampleRate
+      });
+      
+      newBuffer.copyToChannel(result.leftChannel as any, 0);
+      if (buffer.numberOfChannels > 1) {
+          newBuffer.copyToChannel(result.rightChannel as any, 1);
+      }
+      
+      return newBuffer;
   }
 
   terminate() {

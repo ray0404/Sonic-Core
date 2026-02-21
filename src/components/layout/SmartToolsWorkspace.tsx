@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { initProcessor, processAudioBuffer } from '@/services/Processor';
+import { initProcessor } from '@/services/Processor';
+import { offlineProcessor, ProcessType } from '@sonic-core/workers/OfflineProcessorClient';
 import { audioBufferToWav } from '@/utils/wav-export';
 import { saveAs } from 'file-saver';
 import { 
@@ -65,7 +66,12 @@ export const SmartToolsWorkspace: React.FC = () => {
     const isDraggingRef = useRef(false);
 
     useEffect(() => {
-        initProcessor().then(() => setIsSdkReady(true));
+        initProcessor()
+            .then(() => setIsSdkReady(true))
+            .catch(err => {
+                console.error("Failed to init processor", err);
+                setStatus("Error: Failed to load DSP kernel.");
+            });
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
         return () => {
             stopPlayback();
@@ -312,14 +318,42 @@ export const SmartToolsWorkspace: React.FC = () => {
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     };
 
-    const runTool = async (tool: any, label: string, params?: any) => {
+    type ToolId = 'declip' | 'lufs' | 'phase' | 'denoise' | 'monoBass' | 'plosiveGuard' | 'voiceIsolate' | 'psychodynamic' | 'smartLevel' | 'debleed' | 'tapeStabilizer' | 'spectralMatch' | 'echovanish';
+
+    const runTool = async (tool: ToolId, label: string, params?: any) => {
         if (!sourceBuffer) return;
         setIsProcessing(true);
         setStatus(`Running ${label}...`);
         
         try {
-            const result = await processAudioBuffer(processedBuffer || sourceBuffer, tool, params);
-            // setProcessedBuffer(result); // Replaced by addToHistory
+            // Map UI tool IDs to Worker process types
+            const typeMap: Record<ToolId, ProcessType> = {
+                'declip': 'DECLIP',
+                'lufs': 'LUFS_NORMALIZE',
+                'phase': 'PHASE_ROTATION',
+                'denoise': 'SPECTRAL_DENOISE',
+                'monoBass': 'MONO_BASS',
+                'plosiveGuard': 'PLOSIVE_GUARD',
+                'voiceIsolate': 'VOICE_ISOLATE',
+                'psychodynamic': 'PSYCHO_DYNAMIC_EQ',
+                'smartLevel': 'LUFS_NORMALIZE',
+                'debleed': 'DE_BLEED',
+                'tapeStabilizer': 'TAPE_STABILIZER',
+                'spectralMatch': 'SPECTRAL_MATCH',
+                'echovanish': 'ECHO_VANISH'
+            };
+
+            const workerParams = { ...params };
+            if (tool === 'spectralMatch' && referenceBuffer) {
+                workerParams.referenceLeft = referenceBuffer.getChannelData(0);
+            }
+
+            const result = await offlineProcessor.processAudioBuffer(
+                processedBuffer || sourceBuffer, 
+                typeMap[tool], 
+                workerParams
+            );
+            
             addToHistory(result);
             setStatus(`Applied ${label}`);
             setTimeout(() => setStatus(null), 2000);
@@ -329,6 +363,7 @@ export const SmartToolsWorkspace: React.FC = () => {
                 startPlayback(result, progress * result.duration);
             }
         } catch (err) {
+            console.error("Tool execution failed", err);
             setStatus(`Error: ${err}`);
         } finally {
             setIsProcessing(false);
@@ -336,15 +371,15 @@ export const SmartToolsWorkspace: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
+        <div className="flex flex-col h-screen bg-background text-slate-200 overflow-hidden font-sans">
             {/* Header */}
-            <header className="h-14 border-b border-slate-800 flex items-center justify-between px-4 md:px-6 bg-slate-900/50 backdrop-blur-md shrink-0 z-10">
+            <header className="h-14 border-b border-slate-700 flex items-center justify-between px-4 md:px-6 bg-surface/50 backdrop-blur-md shrink-0 z-10">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/20">
+                    <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/20">
                         <Wand2 size={18} className="text-white" />
                     </div>
-                    <h1 className="font-bold tracking-tight text-lg hidden md:block">Sonic Forge <span className="text-blue-500">SmartTools</span></h1>
-                    <h1 className="font-bold tracking-tight text-lg md:hidden">SF <span className="text-blue-500">Tools</span></h1>
+                    <h1 className="font-bold tracking-tight text-lg hidden md:block">Sonic Forge <span className="text-primary">SmartTools</span></h1>
+                    <h1 className="font-bold tracking-tight text-lg md:hidden">SF <span className="text-primary">Tools</span></h1>
                 </div>
                 
                 <div className="flex items-center gap-2 md:gap-4">
@@ -369,7 +404,7 @@ export const SmartToolsWorkspace: React.FC = () => {
                     </div>
 
                     {status && (
-                        <div className="hidden md:flex text-xs font-mono text-blue-400 animate-pulse items-center gap-2 bg-blue-950/30 px-3 py-1.5 rounded-full border border-blue-900/30">
+                        <div className="hidden md:flex text-xs font-mono text-primary animate-pulse items-center gap-2 bg-blue-950/30 px-3 py-1.5 rounded-full border border-blue-900/30">
                             {isProcessing && <Loader2 size={12} className="animate-spin" />}
                             {status}
                         </div>
@@ -387,15 +422,15 @@ export const SmartToolsWorkspace: React.FC = () => {
 
             <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
                 {/* Tools Sidebar */}
-                <aside className="order-2 md:order-1 w-full md:w-72 border-t md:border-t-0 md:border-r border-slate-800 bg-slate-900/30 p-4 flex flex-col gap-6 overflow-y-auto shrink-0 h-1/2 md:h-auto">
+                <aside className="order-2 md:order-1 w-full md:w-72 border-t md:border-t-0 md:border-r border-slate-700 bg-surface/30 p-4 flex flex-col gap-6 overflow-y-auto shrink-0 h-1/2 md:h-auto">
                     <section>
                          <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Views</h2>
-                         <div className="flex gap-2 mb-6 bg-slate-900/50 p-1 rounded-xl border border-slate-800">
+                         <div className="flex gap-2 mb-6 bg-slate-900/50 p-1 rounded-xl border border-slate-700">
                             <button 
                                 onClick={() => setActiveView('TOOLS')}
                                 className={clsx(
                                     "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
-                                    activeView === 'TOOLS' || activeView === 'SETTINGS' ? "bg-blue-600 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
+                                    activeView === 'TOOLS' || activeView === 'SETTINGS' ? "bg-primary text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
                                 )}
                             >
                                 <Waves size={14} />
@@ -416,7 +451,7 @@ export const SmartToolsWorkspace: React.FC = () => {
                         <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Processors</h2>
                         <div className="space-y-2 pb-20 md:pb-0">
                             {/* Loudness Normalize */}
-                            <div className="bg-slate-900/30 rounded-xl border border-slate-800 p-3 space-y-3">
+                            <div className="bg-surface/30 rounded-xl border border-slate-700 p-3 space-y-3">
                                 <ToolButton 
                                     icon={<Settings2 size={14} />} 
                                     label="Loudness Normalize" 
@@ -432,7 +467,7 @@ export const SmartToolsWorkspace: React.FC = () => {
                                         type="range" min="-24" max="-6" step="0.5"
                                         value={lufsParams.targetLufs}
                                         onChange={(e) => setLufsParams({...lufsParams, targetLufs: parseFloat(e.target.value)})}
-                                        className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                        className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary"
                                     />
                                 </div>
                             </div>
@@ -445,7 +480,7 @@ export const SmartToolsWorkspace: React.FC = () => {
                             />
                             
                             {/* De-Clip */}
-                            <div className="bg-slate-900/30 rounded-xl border border-slate-800 p-3 space-y-3">
+                            <div className="bg-surface/30 rounded-xl border border-slate-700 p-3 space-y-3">
                                 <ToolButton 
                                     icon={<Wand2 size={14} />} 
                                     label="De-Clip" 
@@ -461,7 +496,7 @@ export const SmartToolsWorkspace: React.FC = () => {
                                         type="range" min="0.5" max="1.0" step="0.01"
                                         value={declipParams.threshold}
                                         onChange={(e) => setDeclipParams({...declipParams, threshold: parseFloat(e.target.value)})}
-                                        className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                        className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary"
                                     />
                                 </div>
                             </div>

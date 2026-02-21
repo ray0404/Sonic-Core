@@ -14,6 +14,14 @@ interface ResponsiveCanvasPropsV2 {
 export const ResponsiveCanvas: React.FC<ResponsiveCanvasPropsV2> = ({ onMount, onResize, className, label }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const onMountRef = useRef(onMount);
+    const onResizeRef = useRef(onResize);
+
+    // Sync refs
+    useEffect(() => {
+        onMountRef.current = onMount;
+        onResizeRef.current = onResize;
+    }, [onMount, onResize]);
 
     useEffect(() => {
         if (!containerRef.current || !canvasRef.current) return;
@@ -21,7 +29,7 @@ export const ResponsiveCanvas: React.FC<ResponsiveCanvasPropsV2> = ({ onMount, o
         const container = containerRef.current;
         
         // Pass canvas up immediately
-        onMount(canvas);
+        onMountRef.current(canvas);
 
         const observer = new ResizeObserver((entries) => {
             const entry = entries[0];
@@ -38,14 +46,14 @@ export const ResponsiveCanvas: React.FC<ResponsiveCanvasPropsV2> = ({ onMount, o
                     if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                     
                     // Trigger resize callback
-                    if (onResize) onResize(canvas);
+                    if (onResizeRef.current) onResizeRef.current(canvas);
                 }
             }
         });
 
         observer.observe(container);
         return () => observer.disconnect();
-    }, [onMount]);
+    }, []); // Run once on mount
 
     return (
         <div ref={containerRef} className={`relative w-full h-full min-h-[100px] ${className || ''}`}>

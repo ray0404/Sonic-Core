@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Box, useInput, useApp } from 'ink';
 import { SonicEngine } from '../../packages/sonic-core/src/engine-interface.js';
 import { useTUIStore } from './store.js';
+import { linearToDb } from '../../packages/sonic-core/src/utils/audio-math.js';
 
 // Import Views
 import { MainView } from './views/MainView.js';
@@ -40,26 +41,19 @@ export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
 
   // Real-time polling for playback state and meters
   useEffect(() => {
-    const interval = setInterval(async () => {
+    // 1. High-frequency loop for meters and transport (30Hz for Android stability)
+    const meterInterval = setInterval(async () => {
       try {
-        const [state, meters, rack] = await Promise.all([
+        const [state, meters] = await Promise.all([
           engine.getPlaybackState(),
-          engine.getMetering(),
-          engine.getRack()
+          engine.getMetering()
         ]);
         
         setPlayback(state);
-        setRack(rack);
         
-        // Convert RMS linear values to dB for the UI
-        const toDb = (linear: number) => {
-          if (linear <= 0) return -100;
-          return 20 * Math.log10(linear);
-        };
-
         setMetering({
-          input: toDb(meters.levels[0]),
-          output: toDb(meters.levels[1] || meters.levels[0]),
+          input: linearToDb(meters.levels[0]),
+          output: linearToDb(meters.levels[1] || meters.levels[0]),
           gainReduction: 0,
           rack: meters.rackReduction || {},
           fftData: meters.fftData,
@@ -68,9 +62,22 @@ export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
       } catch (e) {
         // Silently fail polling
       }
-    }, 16); // 60Hz polling for maximum transient capture
+    }, 33);
 
-    return () => clearInterval(interval);
+    // 2. Low-frequency loop for rack sync (2Hz)
+    const rackInterval = setInterval(async () => {
+        try {
+            const rack = await engine.getRack();
+            setRack(rack);
+        } catch (e) {
+            // Silently fail
+        }
+    }, 500);
+
+    return () => {
+        clearInterval(meterInterval);
+        clearInterval(rackInterval);
+    };
   }, [engine, setPlayback, setMetering, setRack]);
 
   // Global Shortcuts

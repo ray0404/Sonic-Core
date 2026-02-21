@@ -15,6 +15,7 @@ import { SonicForgeSDK } from '../../packages/sonic-core/src/sdk.js';
 import { getModuleDescriptors } from '../../packages/sonic-core/src/module-descriptors.js';
 import { encodeWAV } from '../../src/utils/wav-export.js';
 import * as OfflineDSP from '../../packages/sonic-core/src/core/offline-processors.js';
+import { linearToDb, dbToLinear } from '../../packages/sonic-core/src/utils/audio-math.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -657,20 +658,29 @@ export class NativeEngine implements SonicEngine {
 
     const stats = this.sdk.analyzeAudio(chunk, this.numChannels, this.sampleRate);
     
+    // Sanitize stats to prevent NaN propagation to UI
+    const sanitize = (val: number, fallback: number = 0) => {
+        return (Number.isNaN(val) || !Number.isFinite(val)) ? fallback : val;
+    };
+
+    const lufs = sanitize(stats[0], -100);
+    const rmsDb = sanitize(stats[3], -100);
+    const peakDb = sanitize(stats[2], -100);
+
     this.meteringData = {
         ...this.meteringData,
-        levels: [Math.pow(10, stats[3]/20), Math.pow(10, stats[3]/20)], // Approx RMS back to linear
-        peakLevels: [Math.pow(10, stats[2]/20), Math.pow(10, stats[2]/20)],
+        levels: [dbToLinear(rmsDb), dbToLinear(rmsDb)],
+        peakLevels: [dbToLinear(peakDb), dbToLinear(peakDb)],
         stats: {
-            lufs: stats[0],
-            lra: stats[1],
-            crest: stats[4],
-            correlation: stats[5],
-            width: stats[6],
-            balance: stats[7],
-            specLow: stats[9],
-            specMid: stats[10],
-            specHigh: stats[11]
+            lufs: lufs,
+            lra: sanitize(stats[1]),
+            crest: sanitize(stats[4]),
+            correlation: sanitize(stats[5], 1),
+            width: sanitize(stats[6]),
+            balance: sanitize(stats[7]),
+            specLow: sanitize(stats[9], 0.33),
+            specMid: sanitize(stats[10], 0.33),
+            specHigh: sanitize(stats[11], 0.33)
         }
     };
 
