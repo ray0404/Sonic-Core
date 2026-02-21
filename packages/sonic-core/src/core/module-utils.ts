@@ -44,6 +44,13 @@ export const createDefaultModule = (type: RackModuleType, id?: string): RackModu
     else if (type === 'TAB_PLAYER') params = { tempo: 120, mode: 1, play: 0 };
     else if (type === 'METRONOME') params = { tempo: 120, enabled: 0 };
     else if (type === 'TUNER') params = { enabled: 0 };
+    else if (type === 'PEDAL_COMPRESSOR') params = { threshold: -24, ratio: 4 };
+    else if (type === 'PEDAL_OVERDRIVE') params = { drive: 30, tone: 50, level: 1.0 };
+    else if (type === 'PEDAL_SUPERNOVA') params = { drive: 50, tone: 50, level: 0.8 };
+    else if (type === 'PEDAL_CHORUS') params = { rate: 1.5, depth: 30 };
+    else if (type === 'PEDAL_TREMOLO') params = { rate: 4, depth: 50 };
+    else if (type === 'PEDAL_DELAY') params = { time: 0.3, feedback: 0.3 };
+    else if (type === 'PEDAL_REVERB') params = { decay: 1.5, mix: 0.2 };
 
     return {
         id: id || crypto.randomUUID(),

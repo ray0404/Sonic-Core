@@ -83,6 +83,15 @@ export const AddModuleMenu: React.FC = () => {
           { label: 'Tab Player', type: 'TAB_PLAYER' },
           { label: 'Metronome', type: 'METRONOME' },
           { label: 'Tuner', type: 'TUNER' },
+      ],
+      'Stompboxes': [
+          { label: 'Pedal: Compressor', type: 'PEDAL_COMPRESSOR' },
+          { label: 'Pedal: Overdrive', type: 'PEDAL_OVERDRIVE' },
+          { label: 'Pedal: Supernova', type: 'PEDAL_SUPERNOVA' },
+          { label: 'Pedal: Chorus', type: 'PEDAL_CHORUS' },
+          { label: 'Pedal: Tremolo', type: 'PEDAL_TREMOLO' },
+          { label: 'Pedal: Delay', type: 'PEDAL_DELAY' },
+          { label: 'Pedal: Reverb', type: 'PEDAL_REVERB' },
       ]
   };
 

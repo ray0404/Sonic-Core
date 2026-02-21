@@ -45,9 +45,16 @@ import { DrumMachineNode } from "../worklets/DrumMachineNode.js";
 import { TabPlayerNode } from "../worklets/TabPlayerNode.js";
 import { MetronomeNode } from "../worklets/MetronomeNode.js";
 import { TunerNode } from "../worklets/TunerNode.js";
+import { PedalCompressorNode } from "../worklets/PedalCompressorNode.js";
+import { PedalOverdriveNode } from "../worklets/PedalOverdriveNode.js";
+import { PedalSupernovaNode } from "../worklets/PedalSupernovaNode.js";
+import { PedalChorusNode } from "../worklets/PedalChorusNode.js";
+import { PedalTremoloNode } from "../worklets/PedalTremoloNode.js";
+import { PedalDelayNode } from "../worklets/PedalDelayNode.js";
+import { PedalReverbNode } from "../worklets/PedalReverbNode.js";
 
 export class NodeFactory {
-    static create(module: RackModule, context: IAudioContext | IOfflineAudioContext, assets: Record<string, AudioBuffer>): IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | null {
+    static create(module: RackModule, context: IAudioContext | IOfflineAudioContext, assets: Record<string, AudioBuffer>): IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | PedalCompressorNode | PedalOverdriveNode | PedalSupernovaNode | PedalChorusNode | PedalTremoloNode | PedalDelayNode | PedalReverbNode | null {
         try {
             let node: any = null;
             switch (module.type) {
@@ -94,6 +101,13 @@ export class NodeFactory {
                 case 'TAB_PLAYER': node = new TabPlayerNode(context); break;
                 case 'METRONOME': node = new MetronomeNode(context); break;
                 case 'TUNER': node = new TunerNode(context); break;
+                case 'PEDAL_COMPRESSOR': node = new PedalCompressorNode(context); break;
+                case 'PEDAL_OVERDRIVE': node = new PedalOverdriveNode(context); break;
+                case 'PEDAL_SUPERNOVA': node = new PedalSupernovaNode(context); break;
+                case 'PEDAL_CHORUS': node = new PedalChorusNode(context); break;
+                case 'PEDAL_TREMOLO': node = new PedalTremoloNode(context); break;
+                case 'PEDAL_DELAY': node = new PedalDelayNode(context); break;
+                case 'PEDAL_REVERB': node = new PedalReverbNode(context); break;
                 default: return null;
             }
 
@@ -107,7 +121,7 @@ export class NodeFactory {
         }
     }
 
-    static updateParams(node: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode, module: RackModule, assets: Record<string, AudioBuffer>) {
+    static updateParams(node: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | PedalCompressorNode | PedalOverdriveNode | PedalSupernovaNode | PedalChorusNode | PedalTremoloNode | PedalDelayNode | PedalReverbNode, module: RackModule, assets: Record<string, AudioBuffer>) {
         if (node instanceof ConvolutionNode) {
             if (module.parameters.mix !== undefined) node.setMix(module.parameters.mix);
             if (module.parameters.irAssetId) {

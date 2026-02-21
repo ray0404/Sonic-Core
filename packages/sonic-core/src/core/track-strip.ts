@@ -16,6 +16,13 @@ import { DrumMachineNode } from "../worklets/DrumMachineNode.js";
 import { TabPlayerNode } from "../worklets/TabPlayerNode.js";
 import { MetronomeNode } from "../worklets/MetronomeNode.js";
 import { TunerNode } from "../worklets/TunerNode.js";
+import { PedalCompressorNode } from "../worklets/PedalCompressorNode.js";
+import { PedalOverdriveNode } from "../worklets/PedalOverdriveNode.js";
+import { PedalSupernovaNode } from "../worklets/PedalSupernovaNode.js";
+import { PedalChorusNode } from "../worklets/PedalChorusNode.js";
+import { PedalTremoloNode } from "../worklets/PedalTremoloNode.js";
+import { PedalDelayNode } from "../worklets/PedalDelayNode.js";
+import { PedalReverbNode } from "../worklets/PedalReverbNode.js";
 
 export class TrackStrip {
     public id: string;
@@ -29,7 +36,7 @@ export class TrackStrip {
     public sourceBuffer: AudioBuffer | null = null;
 
     // Rack State
-    private nodeMap = new Map<string, IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode>();
+    private nodeMap = new Map<string, IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | PedalCompressorNode | PedalOverdriveNode | PedalSupernovaNode | PedalChorusNode | PedalTremoloNode | PedalDelayNode | PedalReverbNode>();
     private connectedIds: string[] = [];
     private _rack: RackModule[] = [];
 
@@ -164,7 +171,7 @@ export class TrackStrip {
             if (!prevNode) {
                 return this.fullRebuildGraph(rack, assets);
             }
-            previousNode = (prevNode instanceof ConvolutionNode || prevNode instanceof GuitarRigNode || prevNode instanceof DrumMachineNode || prevNode instanceof TabPlayerNode || prevNode instanceof MetronomeNode || prevNode instanceof TunerNode)
+            previousNode = (prevNode instanceof ConvolutionNode || prevNode instanceof GuitarRigNode || prevNode instanceof DrumMachineNode || prevNode instanceof TabPlayerNode || prevNode instanceof MetronomeNode || prevNode instanceof TunerNode || prevNode instanceof PedalCompressorNode || prevNode instanceof PedalOverdriveNode || prevNode instanceof PedalSupernovaNode || prevNode instanceof PedalChorusNode || prevNode instanceof PedalTremoloNode || prevNode instanceof PedalDelayNode || prevNode instanceof PedalReverbNode)
                 ? (prevNode as any).output as unknown as IAudioNode<IAudioContext | IOfflineAudioContext>
                 : prevNode as unknown as IAudioNode<IAudioContext | IOfflineAudioContext>;
             previousNode.disconnect();
@@ -196,7 +203,7 @@ export class TrackStrip {
 
             if (!module.bypass) {
                 this.connectNodes(previousNode, node);
-                previousNode = (node instanceof ConvolutionNode || node instanceof GuitarRigNode || node instanceof DrumMachineNode || node instanceof TabPlayerNode || node instanceof MetronomeNode || node instanceof TunerNode)
+                previousNode = (node instanceof ConvolutionNode || node instanceof GuitarRigNode || node instanceof DrumMachineNode || node instanceof TabPlayerNode || node instanceof MetronomeNode || node instanceof TunerNode || node instanceof PedalCompressorNode || node instanceof PedalOverdriveNode || node instanceof PedalSupernovaNode || node instanceof PedalChorusNode || node instanceof PedalTremoloNode || node instanceof PedalDelayNode || node instanceof PedalReverbNode)
                     ? (node as any).output as unknown as IAudioNode<IAudioContext | IOfflineAudioContext>
                     : node as unknown as IAudioNode<IAudioContext | IOfflineAudioContext>;
                 activeIds.push(module.id);
@@ -224,7 +231,7 @@ export class TrackStrip {
 
             if (!module.bypass) {
                 this.connectNodes(previousNode, node);
-                previousNode = (node instanceof ConvolutionNode || node instanceof GuitarRigNode || node instanceof DrumMachineNode || node instanceof TabPlayerNode || node instanceof MetronomeNode || node instanceof TunerNode)
+                previousNode = (node instanceof ConvolutionNode || node instanceof GuitarRigNode || node instanceof DrumMachineNode || node instanceof TabPlayerNode || node instanceof MetronomeNode || node instanceof TunerNode || node instanceof PedalCompressorNode || node instanceof PedalOverdriveNode || node instanceof PedalSupernovaNode || node instanceof PedalChorusNode || node instanceof PedalTremoloNode || node instanceof PedalDelayNode || node instanceof PedalReverbNode)
                     ? (node as any).output as unknown as IAudioNode<IAudioContext | IOfflineAudioContext>
                     : node as unknown as IAudioNode<IAudioContext | IOfflineAudioContext>;
                 activeIds.push(module.id);
@@ -253,8 +260,8 @@ export class TrackStrip {
         });
     }
 
-    private getOrCreateNode(module: RackModule, assets: Record<string, AudioBuffer>): IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode {
-        let node: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | undefined | null = this.nodeMap.get(module.id);
+    private getOrCreateNode(module: RackModule, assets: Record<string, AudioBuffer>): IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | PedalCompressorNode | PedalOverdriveNode | PedalSupernovaNode | PedalChorusNode | PedalTremoloNode | PedalDelayNode | PedalReverbNode {
+        let node: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | PedalCompressorNode | PedalOverdriveNode | PedalSupernovaNode | PedalChorusNode | PedalTremoloNode | PedalDelayNode | PedalReverbNode | undefined | null = this.nodeMap.get(module.id);
         if (!node) {
             node = NodeFactory.create(module, this.context, assets);
             if (node) {
@@ -266,31 +273,25 @@ export class TrackStrip {
         return node!;
     }
 
-    private connectNodes(source: IAudioNode<IAudioContext | IOfflineAudioContext>, dest: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode) {
-        if (dest instanceof ConvolutionNode || dest instanceof GuitarRigNode || dest instanceof DrumMachineNode || dest instanceof TabPlayerNode || dest instanceof MetronomeNode || dest instanceof TunerNode) {
-            source.connect((dest as any).input || (dest as any).output); // Fallback to output if input missing (source->source) or fix logic
-            // Wait, we need to be careful.
-            // GuitarRigNode has .input
-            // DrumMachineNode has .output only (it's a source) - wait, Drum Machine is a Generator?
-            // If it's a generator, it ignores input.
-            // If it's an effect, it has input.
-            
-            // DrumMachine, TabPlayer, Metronome are Generators. They replace the signal or mix into it.
-            // If they are in the rack, they should probably mix with input or ignore it?
-            // Currently they don't have .input.
-            // If we connect 'source' to them, it will fail if they don't have input.
-            // We should check if they have input.
-            
+    private connectNodes(source: IAudioNode<IAudioContext | IOfflineAudioContext>, dest: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | PedalCompressorNode | PedalOverdriveNode | PedalSupernovaNode | PedalChorusNode | PedalTremoloNode | PedalDelayNode | PedalReverbNode) {
+        const isWrapper = dest instanceof ConvolutionNode || 
+                         dest instanceof GuitarRigNode || 
+                         dest instanceof DrumMachineNode || 
+                         dest instanceof TabPlayerNode || 
+                         dest instanceof MetronomeNode || 
+                         dest instanceof TunerNode ||
+                         dest instanceof PedalCompressorNode ||
+                         dest instanceof PedalOverdriveNode ||
+                         dest instanceof PedalSupernovaNode ||
+                         dest instanceof PedalChorusNode ||
+                         dest instanceof PedalTremoloNode ||
+                         dest instanceof PedalDelayNode ||
+                         dest instanceof PedalReverbNode;
+
+        if (isWrapper) {
             if ((dest as any).input) {
                  source.connect((dest as any).input);
             }
-            // If no input (Generator), we don't connect source to it. 
-            // But we must continue the chain?
-            // The generator OUTPUT connects to the next node.
-            // So the previous node's output is left hanging? Or mixed?
-            // In a linear rack, usually generators are at the start.
-            // If placed in middle, they might just add to the stream or replace it.
-            // For now, let's assume they just output.
         } else {
             source.connect(dest as unknown as IAudioNode<IAudioContext | IOfflineAudioContext>);
         }

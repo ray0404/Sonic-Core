@@ -336,6 +336,50 @@ const DESCRIPTORS: Record<string, Omit<ModuleDescriptor, 'type'>> = {
     params: [
       { name: 'enabled', defaultValue: 0, minValue: 0, maxValue: 1 },
     ]
+  },
+  PEDAL_COMPRESSOR: {
+    params: [
+      { name: 'threshold', defaultValue: -24, minValue: -60, maxValue: 0 },
+      { name: 'ratio', defaultValue: 4, minValue: 1, maxValue: 20 },
+    ]
+  },
+  PEDAL_OVERDRIVE: {
+    params: [
+      { name: 'drive', defaultValue: 30, minValue: 0, maxValue: 100 },
+      { name: 'tone', defaultValue: 50, minValue: 0, maxValue: 100 },
+      { name: 'level', defaultValue: 1.0, minValue: 0, maxValue: 1 },
+    ]
+  },
+  PEDAL_SUPERNOVA: {
+    params: [
+      { name: 'drive', defaultValue: 50, minValue: 0, maxValue: 100 },
+      { name: 'tone', defaultValue: 50, minValue: 0, maxValue: 100 },
+      { name: 'level', defaultValue: 0.8, minValue: 0, maxValue: 1 },
+    ]
+  },
+  PEDAL_CHORUS: {
+    params: [
+      { name: 'rate', defaultValue: 1.5, minValue: 0.1, maxValue: 5 },
+      { name: 'depth', defaultValue: 30, minValue: 0, maxValue: 100 },
+    ]
+  },
+  PEDAL_TREMOLO: {
+    params: [
+      { name: 'rate', defaultValue: 4, minValue: 0.5, maxValue: 10 },
+      { name: 'depth', defaultValue: 50, minValue: 0, maxValue: 100 },
+    ]
+  },
+  PEDAL_DELAY: {
+    params: [
+      { name: 'time', defaultValue: 0.3, minValue: 0, maxValue: 1 },
+      { name: 'feedback', defaultValue: 0.3, minValue: 0, maxValue: 0.9 },
+    ]
+  },
+  PEDAL_REVERB: {
+    params: [
+      { name: 'decay', defaultValue: 1.5, minValue: 0.1, maxValue: 10 },
+      { name: 'mix', defaultValue: 0.2, minValue: 0, maxValue: 1 },
+    ]
   }
 };
 

@@ -61,6 +61,13 @@ import { DrumMachineUnit } from './DrumMachineUnit';
 import { TabPlayerUnit } from './TabPlayerUnit';
 import { MetronomeUnit } from './MetronomeUnit';
 import { TunerUnit } from './TunerUnit';
+import { PedalChorusUnit } from './PedalChorusUnit';
+import { PedalCompressorUnit } from './PedalCompressorUnit';
+import { PedalDelayUnit } from './PedalDelayUnit';
+import { PedalOverdriveUnit } from './PedalOverdriveUnit';
+import { PedalReverbUnit } from './PedalReverbUnit';
+import { PedalSupernovaUnit } from './PedalSupernovaUnit';
+import { PedalTremoloUnit } from './PedalTremoloUnit';
 
 
 function SortableItem({ id, children }: { id: string, children: (dragHandleProps: any) => React.ReactNode }) {
@@ -193,6 +200,13 @@ export const EffectsRack: React.FC = () => {
                                     case 'TAB_PLAYER': return <TabPlayerUnit {...commonProps} onUpdate={onUpdate} />;
                                     case 'METRONOME': return <MetronomeUnit {...commonProps} onUpdate={onUpdate} />;
                                     case 'TUNER': return <TunerUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PEDAL_CHORUS': return <PedalChorusUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PEDAL_COMPRESSOR': return <PedalCompressorUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PEDAL_DELAY': return <PedalDelayUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PEDAL_OVERDRIVE': return <PedalOverdriveUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PEDAL_REVERB': return <PedalReverbUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PEDAL_SUPERNOVA': return <PedalSupernovaUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'PEDAL_TREMOLO': return <PedalTremoloUnit {...commonProps} onUpdate={onUpdate} />;
                                     default:
                                         return <div className="p-4 bg-red-900/50 text-red-200 rounded">Unknown Module: {module.type}</div>;
                                 }
