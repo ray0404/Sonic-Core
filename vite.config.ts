@@ -9,6 +9,7 @@ export default defineConfig({
   base: './',
   server: {
     host: true,
+    allowedHosts: true,
     /* headers: {
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin',
@@ -16,6 +17,7 @@ export default defineConfig({
   },
   preview: {
     host: true,
+    allowedHosts: true,
     headers: {
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin',
