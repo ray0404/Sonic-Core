@@ -9,6 +9,8 @@ export const VisualizerExport: React.FC = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [template, setTemplate] = useState<string>('waveform');
 
+  const isSharedArrayBufferSupported = typeof SharedArrayBuffer !== 'undefined';
+
   // Generate simple 2s silence for testing
   const generateDummyAudio = async () => {
       const sampleRate = 44100;
@@ -79,6 +81,13 @@ export const VisualizerExport: React.FC = () => {
     <div className="p-4 bg-slate-800 text-white rounded-lg h-full overflow-y-auto">
       <h2 className="text-xl font-bold mb-4">Social Visualizer Export (Preview)</h2>
       
+      {!isSharedArrayBufferSupported && (
+          <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded text-sm text-red-200">
+              <p className="font-bold mb-1">⚠️ Insecure Context Detected</p>
+              <p>Video export requires SharedArrayBuffer, which is disabled on insecure origins (non-HTTPS/non-localhost). To use this feature, please access via <strong>localhost</strong> or <strong>HTTPS</strong>.</p>
+          </div>
+      )}
+      
       <div className="mb-6 space-y-4">
           <div>
               <label className="block text-sm font-medium mb-1 text-slate-400">Template</label>
@@ -107,9 +116,9 @@ export const VisualizerExport: React.FC = () => {
       <button
         onClick={handleExport}
         className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-semibold disabled:opacity-50 w-full"
-        disabled={status.startsWith('Stage') || status.startsWith('Initializing') || status.startsWith('Starting') || status.startsWith('Analyzing')}
+        disabled={!isSharedArrayBufferSupported || status.startsWith('Stage') || status.startsWith('Initializing') || status.startsWith('Starting') || status.startsWith('Analyzing')}
       >
-        Render 2s Test (440Hz Sine)
+        {isSharedArrayBufferSupported ? 'Render 2s Test (440Hz Sine)' : 'Export Disabled (Insecure Context)'}
       </button>
 
       {videoUrl && (

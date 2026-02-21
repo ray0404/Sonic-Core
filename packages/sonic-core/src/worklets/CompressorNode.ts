@@ -1,15 +1,15 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 /**
  * Node for the CompressorNode effect.
  * Follows the Trinity Pattern.
  */
-export class CompressorNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
+export class CompressorNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
     private reduction: number = 0;
 
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'compressor-processor', {
             numberOfInputs: 1,
             numberOfOutputs: 1,

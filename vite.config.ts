@@ -22,6 +22,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
+    include: ['standardized-audio-context'],
     exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
   },
   plugins: [

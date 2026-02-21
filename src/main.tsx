@@ -2,6 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import { AudioWorkletNode } from 'standardized-audio-context'
+
+console.log('[DEBUG] AudioWorkletNode from SAC:', AudioWorkletNode);
 
 // Mobile debugging - dynamic import to exclude from production bundle
 if (import.meta.env.MODE === 'development') {

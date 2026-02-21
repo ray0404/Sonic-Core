@@ -1,13 +1,13 @@
 import { logger } from "../utils/logger.js";
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 /**
  * Node for the DynamicEQNode effect.
  * Follows the Trinity Pattern.
  */
-export class DynamicEQNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
+export class DynamicEQNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
   public currentGainReduction: number = 0;
 
   constructor(context: IAudioContext | IOfflineAudioContext) {

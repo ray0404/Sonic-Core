@@ -1,7 +1,7 @@
 import { ContextManager } from "./core/context-manager.js";
 import { TrackStrip } from "./core/track-strip.js";
 import { BusStrip } from "./core/bus-strip.js";
-import { logger } from "../../../src/utils/logger.js";
+import { logger } from "./utils/logger.js";
 import { WorkletProvider } from "./core/types.js";
 import { EngineCommand } from "./protocol.js";
 import { createDefaultModule } from "./core/module-utils.js";
