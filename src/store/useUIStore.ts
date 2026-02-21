@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type PanelView = 'SETTINGS' | 'DOCS' | 'MIXER' | 'TIMELINE' | 'ASSETS' | 'EXPORT' | 'TOOLS' | 'CREATIVE';
+export type PanelView = 'SETTINGS' | 'DOCS' | 'MIXER' | 'TIMELINE' | 'ASSETS' | 'EXPORT' | 'TOOLS' | 'CREATIVE' | 'VISUALIZER';
 
 interface UIState {
     isPanelOpen: boolean;
