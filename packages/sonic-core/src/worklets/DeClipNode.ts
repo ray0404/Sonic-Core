@@ -1,6 +1,6 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 export interface DeClipOptions {
     threshold?: number;
@@ -10,8 +10,8 @@ export interface DeClipOptions {
  * Node for the DeClip effect.
  * Uses Zig-powered WASM for declipping via cubic interpolation.
  */
-export class DeClipNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+export class DeClipNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'de-clip-processor');
     }
 

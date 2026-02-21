@@ -1,6 +1,6 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 export interface EchoVanishOptions {
     amount?: number;
@@ -11,8 +11,8 @@ export interface EchoVanishOptions {
  * Node for the EchoVanish effect.
  * Uses Zig-powered WASM for echo reduction.
  */
-export class EchoVanishNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+export class EchoVanishNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'echo-vanish-processor');
     }
 

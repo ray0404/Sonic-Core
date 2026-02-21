@@ -1,13 +1,13 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 /**
  * Node for the SpectralDenoise effect.
  * Uses Zig-powered WASM for spectral noise reduction.
  */
-export class SpectralDenoiseNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+export class SpectralDenoiseNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'spectral-denoise-processor');
     }
 

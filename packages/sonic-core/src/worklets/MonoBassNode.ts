@@ -1,6 +1,6 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 export interface MonoBassOptions {
     frequency?: number;
@@ -10,8 +10,8 @@ export interface MonoBassOptions {
  * Node for the MonoBass effect.
  * Uses Zig-powered WASM for summing low frequencies to mono.
  */
-export class MonoBassNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+export class MonoBassNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'mono-bass-processor');
     }
 

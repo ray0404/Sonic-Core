@@ -1,6 +1,6 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 export interface ZigTransientShaperOptions {
     attackGain?: number;
@@ -8,8 +8,8 @@ export interface ZigTransientShaperOptions {
     mix?: number;
 }
   
-export class ZigTransientShaperNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+export class ZigTransientShaperNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'zig-transient-shaper-processor');
     }
 

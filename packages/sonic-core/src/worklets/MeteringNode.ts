@@ -1,16 +1,16 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 /**
  * Node for the MeteringNode effect.
  * Follows the Trinity Pattern.
  */
-export class MeteringNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
+export class MeteringNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
     public momentary: number = -100;
     public shortTerm: number = -100;
   
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
       super(context, 'lufs-processor', {
         numberOfInputs: 1,
         numberOfOutputs: 1,

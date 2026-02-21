@@ -1,19 +1,19 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 /**
  * Node for the Mastering-grade Lookahead Limiter.
  * Bridges the LimiterProcessor (DSP) to the main thread.
  */
-export class LimiterNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
+export class LimiterNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
     /** Current gain reduction in dB, reported from the audio thread. */
     public currentGainReduction: number = 0;
   
     /**
      * @param {IAudioContext | IOfflineAudioContext} context - The audio context.
      */
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
       super(context, 'limiter-processor', {
         numberOfInputs: 1,
         numberOfOutputs: 1,

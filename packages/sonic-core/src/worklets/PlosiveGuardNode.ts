@@ -1,6 +1,6 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 export interface PlosiveGuardOptions {
     sensitivity?: number;
@@ -12,8 +12,8 @@ export interface PlosiveGuardOptions {
  * Node for the PlosiveGuard effect.
  * Uses Zig-powered WASM for plosive detection and suppression.
  */
-export class PlosiveGuardNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+export class PlosiveGuardNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'plosive-guard-processor');
     }
 

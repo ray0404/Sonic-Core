@@ -1,6 +1,6 @@
-import { AudioWorkletNode, IAudioContext, IOfflineAudioContext, TAudioWorkletNodeConstructor } from "standardized-audio-context";
+import * as SAC from "standardized-audio-context";
 
-const AudioWorkletNodeBase = AudioWorkletNode as TAudioWorkletNodeConstructor;
+const AudioWorkletNodeBase = SAC.AudioWorkletNode as SAC.TAudioWorkletNodeConstructor;
 
 export interface PsychoDynamicEQOptions {
     intensity?: number;
@@ -11,8 +11,8 @@ export interface PsychoDynamicEQOptions {
  * Node for the PsychoDynamicEQ effect.
  * Uses Zig-powered WASM for level-dependent psychoacoustic EQ.
  */
-export class PsychoDynamicEQNode extends AudioWorkletNodeBase<IAudioContext | IOfflineAudioContext> {
-    constructor(context: IAudioContext | IOfflineAudioContext) {
+export class PsychoDynamicEQNode extends AudioWorkletNodeBase<SAC.IAudioContext | SAC.IOfflineAudioContext> {
+    constructor(context: SAC.IAudioContext | SAC.IOfflineAudioContext) {
         super(context, 'psycho-dynamic-eq-processor');
     }
 
