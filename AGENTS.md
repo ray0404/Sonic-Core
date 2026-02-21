@@ -5,26 +5,25 @@ This document provides a comprehensive overview of the Sonic-Core codebase, arch
 ## 1. Project Identity & Purpose
 
 *   **Name:** Sonic-Core
-*   **Description:** A professional-grade, local-first Progressive Web App (PWA) for audio mastering and processing. It bridges the gap between browser-based tools and desktop DAWs.
+*   **Description:** A professional-grade, local-first audio workstation platform. It bridges the gap between browser-based tools and desktop DAWs by combining precision DSP with a creative production suite.
 *   **Core Philosophy:**
-    *   **Zero-Latency:** Real-time processing via AudioWorklets.
+    *   **Zero-Latency:** Real-time processing via AudioWorklets and high-performance WebAudio graphs.
     *   **High Performance:** Heavy offline processing via Zig/WebAssembly.
     *   **Local-First:** All data remains on the user's device (IndexedDB); no server-side audio processing.
-    *   **Privacy-Centric:** No cloud dependencies for core functionality.
+    *   **AI-Enhanced:** Creative co-pilot features powered by Google Gemini for track blueprinting and tone matching.
 
 ## 2. Technical Stack
 
 ### Frontend & State
-*   **Framework:** React 18 (Vite)
+*   **Framework:** React 18 (Vite 5)
 *   **Language:** TypeScript 5.x
 *   **State Management:** Zustand (Store), `idb-keyval` (Persistence)
-*   **Styling:** Tailwind CSS, `lucide-react` (Icons)
-*   **Routing:** Custom hash-based routing (`usePanelRouting`).
+*   **AI Integration:** `@google/genai` (Gemini 2.5 Flash)
+*   **Styling:** Tailwind CSS, Framer Motion, `lucide-react` (Icons)
 
-### Audio Engine
-*   **API:** Web Audio API (standardized-audio-context)
-*   **Real-time DSP:** AudioWorklets (Pure JavaScript/TypeScript processors)
-*   **Offline DSP:** Zig 0.13.0 compiled to WebAssembly (WASM)
+### Audio Engine (Dual-Engine Architecture)
+*   **Precision Engine (Zig/WASM):** High-performance kernel for spectral editing, denoising, and isolation.
+*   **Creative Engine (TS/WebAudio):** Modular graph for guitar rig simulation, synthesizers, and modulation effects.
 *   **Threading:**
     *   **Main Thread:** UI, State, Audio Graph Orchestration.
     *   **Audio Thread:** Real-time processing (AudioWorklets).
@@ -33,7 +32,7 @@ This document provides a comprehensive overview of the Sonic-Core codebase, arch
 ### CLI Tool
 *   **Framework:** Ink (React for CLI)
 *   **Engine:** Puppeteer (Headless Chrome for audio context)
-*   **Purpose:** Batch processing automation via terminal.
+*   **Purpose:** Batch processing automation and headless project management.
 
 ## 3. Architecture Overview
 
@@ -42,82 +41,75 @@ Sonic-Core follows a strict **Three-Layer Architecture**:
 1.  **Intent Layer (UI & Store):**
     *   **Role:** Captures user actions and manages application state.
     *   **Key Files:** `src/store/useAudioStore.ts`, `src/components/**/*.tsx`
-    *   **Behavior:** Updates the Zustand store, which triggers subscriptions to update the engine.
+    *   **Creative State:** `src/store/useGuitarStore.ts` handles granular guitar rig parameters.
 
 2.  **Orchestration Layer (Audio Engine):**
-    *   **Role:** Translates state changes into Web Audio API calls.
-    *   **Key Files:** `packages/sonic-core/src/mixer.ts`, `packages/sonic-core/src/core/track-strip.ts`, `packages/sonic-core/src/core/bus-strip.ts`
-    *   **Behavior:** Manages `AudioContext`, `AudioNode` connections, and parameter automation (`setTargetAtTime`).
+    *   **Role:** Translates state changes into imperative Web Audio API calls.
+    *   **Key Files:** `packages/sonic-core/src/mixer.ts`, `packages/sonic-core/src/core/track-strip.ts`
+    *   **Logic:** Manages the lifecycle of both WASM-based Worklets and TS-based Creative Nodes.
 
 3.  **Processing Layer (DSP):**
     *   **Role:** The actual math modifying audio samples.
-    *   **Key Files:** `packages/sonic-core/src/worklets/*.js` (Real-time), `packages/sonic-core/src/dsp/zig/*.zig` (Offline)
-    *   **Behavior:** Runs in isolated threads (Audio or Worker) to prevent UI blocking.
+    *   **Key Paths:** 
+        *   `packages/sonic-core/src/worklets/`: Real-time processors.
+        *   `libs/sonic-dsp-kernel/`: Zig source for offline processing.
+        *   `packages/sonic-core/src/creative/`: TS-based audio logic for amps/pedals.
 
 ## 4. Key Workflows & Features
 
-### A. Real-time Effects Rack ("The Trinity Pattern")
-Adding a new real-time effect requires three components:
-1.  **Processor (DSP):** `packages/sonic-core/src/worklets/[name]-processor.js` (Extends `AudioWorkletProcessor`).
-2.  **Node (Bridge):** `packages/sonic-core/src/worklets/[Name]Node.ts` (Extends `AudioWorkletNode`, handles parameter mapping).
-3.  **UI (Component):** `src/components/rack/[Name]Unit.tsx` (React controls).
+### A. Modular Rack ("The Trinity Pattern")
+Adding a new effect requires three components:
+1.  **Processor/Logic:** Located in `worklets/` (JS) or `creative/` (TS).
+2.  **Node (Bridge):** Wrapper in `packages/sonic-core/src/worklets/[Name]Node.ts`.
+3.  **UI (Component):** `src/components/rack/[Name]Unit.tsx`.
 
-### B. Smart Processing (Zig/WASM)
+### B. Creative Suite
+*   **Guitar Rig:** 4 Amp models (Clean, Crunch, Modern, Bass) + IR Cabinet Simulator.
+*   **Standalone Stompboxes:** Individual pedal modules (Chorus, Delay, Reverb, Overdrive, etc.) that can be placed anywhere in the signal chain.
+*   **Production Tools:** Synthesized Drum Machine, Tab Player (MIDI-style playback), and high-precision Tuner/Metronome.
+
+### C. AI Co-Pilot (Gemini)
+*   **Jam Session:** Generates musical blueprints (chords/tempo) from text descriptions.
+*   **Tone Modeler:** Automatically configures the Guitar Rig to match a requested "vibe" or style.
+
+### D. Smart Processing (Zig/WASM)
 High-performance offline processing for file repair and normalization.
-*   **Source:** `packages/sonic-core/src/dsp/zig/main.zig`
-*   **Build:** `npm run build:wasm` (Outputs to `public/wasm/dsp.wasm`)
-*   **Bridge:** `packages/sonic-core/src/workers/offline-processor.worker.ts` loads WASM and manages memory (`alloc`/`free`).
-*   **UI:** `src/components/layout/panels/BatchProcessMenu.tsx`
-*   **Features:**
-    *   **Loudness Normalization:** Target specific LUFS (e.g., -14).
-    *   **Phase Rotation:** Recovers headroom by smearing transients.
-    *   **De-Clipper:** Repairs digital clipping via cubic interpolation.
-    *   **Spectral Denoise:** FFT-based noise reduction.
-    *   **Mono Bass:** Sums low frequencies to mono below a cutoff (e.g., 120Hz).
-
-### C. Multi-Track Mixer
-*   Supports multiple audio tracks with individual Volume, Pan, Mute, and Solo.
-*   Master Bus for global processing.
-*   **Drag & Drop:** Reorder effects in the rack.
-
-### D. Offline/Batch Workflow
-The "Smart Processing" panel offers two modes:
-1.  **Project Track Mode:** Destructively processes a track within the current project. Supports Undo/Redo.
-2.  **External File Mode:** Upload -> Process -> Preview (Scrubbable) -> Download. Does not affect the project.
+*   **Features:** LUFS Normalizer, De-Clipper, Spectral Denoise, Phase Rotation, Voice Isolate.
 
 ## 5. Development & Operations
 
 ### Prerequisites
 *   Node.js 18+
-*   Zig 0.13.0+ (Required for `build:wasm`)
+*   Zig 0.13.0 (Required for WASM build)
 
 ### Commands
 *   `npm run dev`: Start Vite development server.
 *   `npm run build`: Build web application.
 *   `npm run build:wasm`: Compile Zig DSP to WebAssembly.
-*   `npm run build:cli`: Build CLI tool.
+*   `npm run dev:cli`: Start interactive TUI.
 *   `npm test`: Run Vitest suite.
 
 ### File Structure Map
 ```
-src/
-├── audio/              # Core Audio Engine
-│   ├── core/           # Track/Bus logic, Context management
-│   ├── dsp/zig/        # Zig source code for offline processing
-│   ├── workers/        # Web Workers & Client bridges
-│   ├── worklets/       # AudioWorklet processors & Node wrappers
-│   └── mixer.ts        # Main MixerEngine entry point
-├── components/         # React UI
-│   ├── layout/         # Workspace, Panels (Tools, Export)
-│   ├── rack/           # Effect units, Rack container
-│   └── mixer/          # Faders, Meters
-├── store/              # Zustand state stores
-├── utils/              # Helpers (WAV export, Logger)
-└── main.tsx            # App Entry
+Sonic-Core/
+├── cli/                # Terminal UI & CLI Engine
+├── libs/
+│   └── sonic-dsp-kernel/ # Zig DSP source
+├── packages/
+│   └── sonic-core/     # Headless engine library
+│       └── src/
+│           ├── core/   # Engine internals
+│           ├── creative/ # Creative module logic
+│           └── worklets/ # AudioWorklets & Node wrappers
+├── src/                # PWA Frontend
+│   ├── components/     # UI Units & Layouts
+│   ├── services/       # AI & Audio utilities
+│   └── store/          # Zustand stores
+└── public/
+    └── wasm/           # Compiled WASM binary
 ```
 
-## 6. Known Constraints & Notes
-*   **AudioContext State:** Browsers require a user gesture to resume the AudioContext. The app handles this via the "Start" overlay.
-*   **WASM Memory:** The Zig allocator is a `GeneralPurposeAllocator`. The worker bridge manually handles `alloc` and `free` to prevent leaks.
-*   **Persistence:** Large audio files are stored in IndexedDB. Use `src/hooks/useProjectPersistence.ts` for managing saves.
-*   **CLI:** The CLI relies on `puppeteer-core`. Ensure a compatible Chrome/Chromium binary is available if running outside standard environments.
+## 6. Roadmap (2026)
+1.  **Distribution:** Automated Social Visualizer Export (FFmpeg.wasm).
+2.  **Integration:** Local Plugin Wrapper (VST3/AU Desktop Bridge).
+3.  **UX Evolution:** Reactive Node Graph View (Visual "wire" routing).
