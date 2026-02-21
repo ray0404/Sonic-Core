@@ -52,47 +52,158 @@ vi.stubGlobal('AudioNode', AudioNodeMock);
 class AudioContextMock {
   state = 'suspended';
   resume = vi.fn();
-  createGain = vi.fn(() => ({
-    gain: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-  }));
-  createAnalyser = vi.fn(() => ({
-    fftSize: 2048,
-    frequencyBinCount: 1024,
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-    getByteFrequencyData: vi.fn(),
-    getByteTimeDomainData: vi.fn(),
-    getFloatTimeDomainData: vi.fn(),
-  }));
-  createStereoPanner = vi.fn(() => ({
-    pan: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-  }));
-  createConvolver = vi.fn(() => ({ 
-      connect: vi.fn(), 
+  createGain = vi.fn(() => {
+    const node = {
+      context: this as any,
+      gain: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createAnalyser = vi.fn(() => {
+    const node = {
+      context: this as any,
+      fftSize: 2048,
+      frequencyBinCount: 1024,
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+      getByteFrequencyData: vi.fn(),
+      getByteTimeDomainData: vi.fn(),
+      getFloatTimeDomainData: vi.fn(),
+    };
+    return node;
+  });
+  createStereoPanner = vi.fn(() => {
+    const node = {
+      context: this as any,
+      pan: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createConvolver = vi.fn(() => {
+    const node = { 
+      context: this as any,
+      connect: vi.fn((dest) => dest), 
       disconnect: vi.fn() 
-  }));
-  createChannelSplitter = vi.fn((_channels) => ({
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-  }));
-  createBufferSource = vi.fn(() => ({
-      connect: vi.fn(),
+    };
+    return node;
+  });
+  createChannelSplitter = vi.fn((_channels) => {
+    const node = {
+      context: this as any,
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createBufferSource = vi.fn(() => {
+    const node = {
+      context: this as any,
+      connect: vi.fn((dest) => dest),
       start: vi.fn(),
       stop: vi.fn(),
       disconnect: vi.fn(),
       buffer: null,
       onended: null,
+    };
+    return node;
+  });
+  createDynamicsCompressor = vi.fn(() => {
+    const node = {
+      context: this as any,
+      threshold: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      knee: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      ratio: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      attack: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      release: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      reduction: 0,
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createBiquadFilter = vi.fn(() => {
+    const node = {
+      context: this as any,
+      type: 'lowpass',
+      frequency: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      detune: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      Q: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      gain: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createWaveShaper = vi.fn(() => {
+    const node = {
+      context: this as any,
+      curve: null,
+      oversample: 'none',
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createOscillator = vi.fn(() => {
+    const node = {
+      context: this as any,
+      type: 'sine',
+      frequency: { value: 440, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      detune: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      start: vi.fn(),
+      stop: vi.fn(),
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+      onended: null,
+    };
+    return node;
+  });
+  createDelay = vi.fn(() => {
+    const node = {
+      context: this as any,
+      delayTime: { value: 0, setTargetAtTime: vi.fn(), setValueAtTime: vi.fn() },
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createChannelMerger = vi.fn(() => {
+    const node = {
+      context: this as any,
+      connect: vi.fn((dest) => dest),
+      disconnect: vi.fn(),
+    };
+    return node;
+  });
+  createBuffer = vi.fn(() => ({
+    duration: 1,
+    length: 44100,
+    numberOfChannels: 1,
+    sampleRate: 44100,
+    getChannelData: vi.fn(() => new Float32Array(44100)),
+    copyFromChannel: vi.fn(),
+    copyToChannel: vi.fn(),
   }));
   decodeAudioData = vi.fn();
   audioWorklet = {
     addModule: vi.fn().mockResolvedValue(undefined),
   };
-  destination = {};
+  destination = {
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    numberOfInputs: 1,
+    numberOfOutputs: 0,
+    channelCount: 2,
+    channelCountMode: 'explicit',
+    channelInterpretation: 'speakers',
+    context: {} as any,
+  };
   currentTime = 0;
+  sampleRate = 44100;
 }
 vi.stubGlobal('AudioContext', AudioContextMock);
 // Ensure we handle window.AudioContext for tests that run in "jsdom"

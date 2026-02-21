@@ -6,6 +6,7 @@ import { SettingsView } from './panels/SettingsView';
 import { AssetManagerView } from './panels/AssetManagerView';
 import { ExportView } from './panels/ExportView';
 import { ToolsView } from './panels/ToolsView';
+import { JamSession } from './panels/JamSession';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
@@ -20,7 +21,8 @@ export const SidePanel: React.FC = () => {
         'TIMELINE': 'Timeline',
         'ASSETS': 'Asset Manager',
         'EXPORT': 'Export',
-        'TOOLS': 'Smart Tools'
+        'TOOLS': 'Smart Tools',
+        'CREATIVE': 'Creative Studio'
     };
 
     const renderContent = () => {
@@ -29,6 +31,7 @@ export const SidePanel: React.FC = () => {
             case 'ASSETS': return <AssetManagerView />;
             case 'EXPORT': return <ExportView />;
             case 'TOOLS': return <ToolsView />;
+            case 'CREATIVE': return <JamSession />;
             default:
                 return (
                     <div className="flex flex-col items-center justify-center h-full text-slate-500 opacity-50">

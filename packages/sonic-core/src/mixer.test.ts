@@ -48,6 +48,31 @@ describe('MixerEngine Refactor', () => {
         expect(node).toBeDefined();
     });
 
+    it('should handle GUITAR_RIG module addition and updates', async () => {
+        await engine.init(mockProvider);
+        engine.handleCommand({
+            type: 'TRACK_ADD',
+            payload: { id: 'track-1', name: 'Guitar Track' }
+        });
+
+        engine.handleCommand({
+            type: 'MODULE_ADD',
+            payload: { trackId: 'track-1', moduleId: 'guitar-1', type: 'GUITAR_RIG' }
+        });
+
+        const track = engine.getTrack('track-1');
+        const node = track?.getModuleNode('guitar-1');
+        expect(node).toBeDefined();
+
+        // Update a guitar rig parameter
+        expect(() => {
+            engine.handleCommand({
+                type: 'PARAM_SET',
+                payload: { moduleId: 'guitar-1', param: 'distortion', value: 50 }
+            });
+        }).not.toThrow();
+    });
+
     it('should handle PARAM_SET command', async () => {
         await engine.init(mockProvider);
         engine.handleCommand({

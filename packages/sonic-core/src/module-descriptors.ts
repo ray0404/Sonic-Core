@@ -295,6 +295,47 @@ const DESCRIPTORS: Record<string, Omit<ModuleDescriptor, 'type'>> = {
     params: [
       { name: 'targetLufs', defaultValue: -14, minValue: -24, maxValue: -6 },
     ]
+  },
+  GUITAR_RIG: {
+    params: [
+      { name: 'gain', defaultValue: 1.0, minValue: 0, maxValue: 3 },
+      { name: 'distortion', defaultValue: 0, minValue: 0, maxValue: 100 },
+      { name: 'eqLow', defaultValue: 0, minValue: -20, maxValue: 20 },
+      { name: 'eqMid', defaultValue: 0, minValue: -20, maxValue: 20 },
+      { name: 'eqHigh', defaultValue: 0, minValue: -20, maxValue: 20 },
+      { name: 'reverbMix', defaultValue: 0.1, minValue: 0, maxValue: 1 },
+      { name: 'delayTime', defaultValue: 0.3, minValue: 0, maxValue: 1 },
+      { name: 'enableCompressor', defaultValue: 0, minValue: 0, maxValue: 1 },
+      { name: 'enableOverdrive', defaultValue: 0, minValue: 0, maxValue: 1 },
+      { name: 'enableChorus', defaultValue: 0, minValue: 0, maxValue: 1 },
+      { name: 'enableDelay', defaultValue: 0, minValue: 0, maxValue: 1 },
+      { name: 'enableReverb', defaultValue: 1, minValue: 0, maxValue: 1 },
+    ]
+  },
+  DRUM_MACHINE: {
+    params: [
+      { name: 'tempo', defaultValue: 120, minValue: 40, maxValue: 240 },
+      { name: 'volume', defaultValue: 0.8, minValue: 0, maxValue: 1 },
+      { name: 'play', defaultValue: 0, minValue: 0, maxValue: 1 },
+    ]
+  },
+  TAB_PLAYER: {
+    params: [
+      { name: 'tempo', defaultValue: 120, minValue: 40, maxValue: 240 },
+      { name: 'mode', defaultValue: 1, minValue: 0, maxValue: 2 }, // 0: Acoustic, 1: Clean, 2: Distorted
+      { name: 'play', defaultValue: 0, minValue: 0, maxValue: 1 },
+    ]
+  },
+  METRONOME: {
+    params: [
+      { name: 'tempo', defaultValue: 120, minValue: 40, maxValue: 240 },
+      { name: 'enabled', defaultValue: 0, minValue: 0, maxValue: 1 },
+    ]
+  },
+  TUNER: {
+    params: [
+      { name: 'enabled', defaultValue: 0, minValue: 0, maxValue: 1 },
+    ]
   }
 };
 

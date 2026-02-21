@@ -39,6 +39,11 @@ export const createDefaultModule = (type: RackModuleType, id?: string): RackModu
     else if (type === 'ZIG_TRANSIENT_SHAPER') params = { attackGain: 0, sustainGain: 0, mix: 1 };
     else if (type === 'SPECTRAL_MATCH') params = { amount: 0.5, isLearning: 0, hasReference: false };
     else if (type === 'LUFS_NORMALIZER') params = { targetLufs: -14 };
+    else if (type === 'GUITAR_RIG') params = { gain: 1.0, distortion: 0, eqLow: 0, eqMid: 0, eqHigh: 0, enableCompressor: 0, enableOverdrive: 0, enableChorus: 0, enableDelay: 0, enableReverb: 1 };
+    else if (type === 'DRUM_MACHINE') params = { tempo: 120, volume: 0.8, play: 0 };
+    else if (type === 'TAB_PLAYER') params = { tempo: 120, mode: 1, play: 0 };
+    else if (type === 'METRONOME') params = { tempo: 120, enabled: 0 };
+    else if (type === 'TUNER') params = { enabled: 0 };
 
     return {
         id: id || crypto.randomUUID(),

@@ -76,6 +76,13 @@ export const AddModuleMenu: React.FC = () => {
       'Utility': [
           { label: 'Loudness Meter', type: 'LOUDNESS_METER' },
           { label: 'TPDF Dithering', type: 'DITHERING' },
+      ],
+      'Creative Suite': [
+          { label: 'Guitar Rig', type: 'GUITAR_RIG' },
+          { label: 'Drum Machine', type: 'DRUM_MACHINE' },
+          { label: 'Tab Player', type: 'TAB_PLAYER' },
+          { label: 'Metronome', type: 'METRONOME' },
+          { label: 'Tuner', type: 'TUNER' },
       ]
   };
 

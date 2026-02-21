@@ -1,13 +1,14 @@
 import React, { useRef } from 'react';
 import { useUIStore, PanelView } from '@/store/useUIStore';
 import { useAudioStore } from '@/store/useAudioStore';
-import { Settings, BookOpen, Sliders, Library, Download, Wand2, FolderOpen, Save } from 'lucide-react';
+import { Settings, BookOpen, Sliders, Library, Download, Wand2, FolderOpen, Save, Sparkles } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ProjectPackager } from '@/services/ProjectPackager';
 import { ProjectLoader } from '@/services/ProjectLoader';
 import { logger } from '@/utils/logger';
 
 const NAV_ITEMS: { id: PanelView; label: string; icon: React.ElementType; href?: string }[] = [
+    { id: 'CREATIVE', label: 'Creative Studio', icon: Sparkles },
     { id: 'TOOLS', label: 'Smart Tools', icon: Wand2 },
     { id: 'SETTINGS', label: 'Settings', icon: Settings },
     { id: 'DOCS', label: 'Documentation', icon: BookOpen, href: '/docs/index.html' },

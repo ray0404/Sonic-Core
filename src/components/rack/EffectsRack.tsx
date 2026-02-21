@@ -56,6 +56,11 @@ import { ZigDeEsserUnit } from './ZigDeEsserUnit';
 import { ZigTransientShaperUnit } from './ZigTransientShaperUnit';
 import { SpectralMatchUnit } from './SpectralMatchUnit';
 import { LufsNormalizerUnit } from './LufsNormalizerUnit';
+import { GuitarRigUnit } from './GuitarRigUnit';
+import { DrumMachineUnit } from './DrumMachineUnit';
+import { TabPlayerUnit } from './TabPlayerUnit';
+import { MetronomeUnit } from './MetronomeUnit';
+import { TunerUnit } from './TunerUnit';
 
 
 function SortableItem({ id, children }: { id: string, children: (dragHandleProps: any) => React.ReactNode }) {
@@ -183,6 +188,11 @@ export const EffectsRack: React.FC = () => {
                                     case 'ZIG_TRANSIENT_SHAPER': return <ZigTransientShaperUnit {...commonProps} onUpdate={onUpdate} />;
                                     case 'SPECTRAL_MATCH': return <SpectralMatchUnit {...commonProps} onUpdate={onUpdate} />;
                                     case 'LUFS_NORMALIZER': return <LufsNormalizerUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'GUITAR_RIG': return <GuitarRigUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'DRUM_MACHINE': return <DrumMachineUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'TAB_PLAYER': return <TabPlayerUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'METRONOME': return <MetronomeUnit {...commonProps} onUpdate={onUpdate} />;
+                                    case 'TUNER': return <TunerUnit {...commonProps} onUpdate={onUpdate} />;
                                     default:
                                         return <div className="p-4 bg-red-900/50 text-red-200 rounded">Unknown Module: {module.type}</div>;
                                 }

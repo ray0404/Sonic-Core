@@ -40,9 +40,14 @@ import { ZigDeEsserNode } from "../worklets/ZigDeEsserNode.js";
 import { ZigTransientShaperNode } from "../worklets/ZigTransientShaperNode.js";
 import { SpectralMatchNode } from "../worklets/SpectralMatchNode.js";
 import { LufsNormalizerNode } from "../worklets/LufsNormalizerNode.js";
+import { GuitarRigNode } from "../worklets/GuitarRigNode.js";
+import { DrumMachineNode } from "../worklets/DrumMachineNode.js";
+import { TabPlayerNode } from "../worklets/TabPlayerNode.js";
+import { MetronomeNode } from "../worklets/MetronomeNode.js";
+import { TunerNode } from "../worklets/TunerNode.js";
 
 export class NodeFactory {
-    static create(module: RackModule, context: IAudioContext | IOfflineAudioContext, assets: Record<string, AudioBuffer>): IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | null {
+    static create(module: RackModule, context: IAudioContext | IOfflineAudioContext, assets: Record<string, AudioBuffer>): IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode | null {
         try {
             let node: any = null;
             switch (module.type) {
@@ -84,6 +89,11 @@ export class NodeFactory {
                 case 'ZIG_TRANSIENT_SHAPER': node = new ZigTransientShaperNode(context); break;
                 case 'SPECTRAL_MATCH': node = new SpectralMatchNode(context); break;
                 case 'LUFS_NORMALIZER': node = new LufsNormalizerNode(context); break;
+                case 'GUITAR_RIG': node = new GuitarRigNode(context); break;
+                case 'DRUM_MACHINE': node = new DrumMachineNode(context); break;
+                case 'TAB_PLAYER': node = new TabPlayerNode(context); break;
+                case 'METRONOME': node = new MetronomeNode(context); break;
+                case 'TUNER': node = new TunerNode(context); break;
                 default: return null;
             }
 
@@ -97,7 +107,7 @@ export class NodeFactory {
         }
     }
 
-    static updateParams(node: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode, module: RackModule, assets: Record<string, AudioBuffer>) {
+    static updateParams(node: IAudioNode<IAudioContext | IOfflineAudioContext> | ConvolutionNode | GuitarRigNode | DrumMachineNode | TabPlayerNode | MetronomeNode | TunerNode, module: RackModule, assets: Record<string, AudioBuffer>) {
         if (node instanceof ConvolutionNode) {
             if (module.parameters.mix !== undefined) node.setMix(module.parameters.mix);
             if (module.parameters.irAssetId) {
