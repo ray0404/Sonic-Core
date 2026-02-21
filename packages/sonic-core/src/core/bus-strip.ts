@@ -1,6 +1,6 @@
 import { IAudioContext, IOfflineAudioContext } from "standardized-audio-context";
 import { TrackStrip } from "./track-strip.js";
-import { logger } from "../../../../src/utils/logger.js";
+import { logger } from "../utils/logger.js";
 
 export class BusStrip extends TrackStrip {
     constructor(id: string, context?: IAudioContext | IOfflineAudioContext) {

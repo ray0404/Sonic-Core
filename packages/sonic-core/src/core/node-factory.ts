@@ -1,6 +1,6 @@
 import { IAudioContext, IOfflineAudioContext, IAudioNode } from "standardized-audio-context";
 import type { RackModule } from "../types.js";
-import { logger } from "../../../../src/utils/logger.js";
+import { logger } from "../utils/logger.js";
 
 import { DynamicEQNode } from "../worklets/DynamicEQNode.js";
 import { TransientShaperNode } from "../worklets/TransientShaperNode.js";
