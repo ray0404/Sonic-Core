@@ -655,47 +655,22 @@ export class NativeEngine implements SonicEngine {
   private updateMetering(chunk: Float32Array) {
     if (!this.sdk) return;
 
-    const step = this.numChannels;
-    let sumSqL = 0;
-    let sumSqR = 0;
-    let peakL = 0;
-    let peakR = 0;
-
-    for (let i = 0; i < chunk.length; i += step) {
-        const l = chunk[i];
-        const r = step > 1 && i + 1 < chunk.length ? chunk[i + 1] : l;
-
-        sumSqL += l * l;
-        if (step > 1) sumSqR += r * r;
-
-        const absL = Math.abs(l);
-        const absR = Math.abs(r);
-        if (absL > peakL) peakL = absL;
-        if (absR > peakR) peakR = absR;
-    }
-
-    const sampleCount = chunk.length / step;
-    const rmsL = Math.sqrt(sumSqL / sampleCount);
-    const rmsR = step > 1 ? Math.sqrt(sumSqR / sampleCount) : rmsL;
-    const rmsAvg = (rmsL + rmsR) / 2;
-
-    const rmsDb = 20 * Math.log10(rmsAvg + 1e-10);
-    const peakDb = 20 * Math.log10(Math.max(peakL, peakR) + 1e-10);
-
+    const stats = this.sdk.analyzeAudio(chunk, this.numChannels, this.sampleRate);
+    
     this.meteringData = {
         ...this.meteringData,
-        levels: [rmsL, rmsR],
-        peakLevels: [peakL, peakR],
+        levels: [Math.pow(10, stats[3]/20), Math.pow(10, stats[3]/20)], // Approx RMS back to linear
+        peakLevels: [Math.pow(10, stats[2]/20), Math.pow(10, stats[2]/20)],
         stats: {
-            lufs: rmsDb - 0.691,
-            lra: 0,
-            crest: peakDb - rmsDb,
-            correlation: 1,
-            width: 0,
-            balance: 0,
-            specLow: 0,
-            specMid: 0,
-            specHigh: 0
+            lufs: stats[0],
+            lra: stats[1],
+            crest: stats[4],
+            correlation: stats[5],
+            width: stats[6],
+            balance: stats[7],
+            specLow: stats[9],
+            specMid: stats[10],
+            specHigh: stats[11]
         }
     };
 

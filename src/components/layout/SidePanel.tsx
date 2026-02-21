@@ -22,7 +22,8 @@ export const SidePanel: React.FC = () => {
         'TIMELINE': 'Timeline',
         'ASSETS': 'Asset Manager',
         'EXPORT': 'Export',
-        'TOOLS': 'Smart Tools',
+        'TOOLS': 'Batch Processing',
+        'SMART_TOOLS': 'Smart Tools',
         'CREATIVE': 'Creative Studio',
         'VISUALIZER': 'Visualizer Export'
     };

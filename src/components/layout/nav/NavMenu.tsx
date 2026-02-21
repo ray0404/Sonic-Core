@@ -9,7 +9,7 @@ import { logger } from '@/utils/logger';
 
 const NAV_ITEMS: { id: PanelView; label: string; icon: React.ElementType; href?: string }[] = [
     { id: 'CREATIVE', label: 'Creative Studio', icon: Sparkles },
-    { id: 'TOOLS', label: 'Smart Tools', icon: Wand2 },
+    { id: 'SMART_TOOLS', label: 'Smart Tools', icon: Wand2 },
     { id: 'VISUALIZER', label: 'Visualizer', icon: Video },
     { id: 'SETTINGS', label: 'Settings', icon: Settings },
     { id: 'DOCS', label: 'Documentation', icon: BookOpen, href: '/docs/index.html' },

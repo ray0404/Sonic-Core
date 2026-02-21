@@ -619,38 +619,6 @@ export const BatchProcessMenu: React.FC = () => {
 
             <button 
                 disabled={isProcessing || (mode === 'file' && !currentFileBuffer)}
-                onClick={() => processAudio("Voice Isolate", (l, r, sr) => offlineProcessor.isolateVoice(l, r, sr, 0.5))}
-                className={btnClass}
-            >
-                <span>Voice Isolate (AI)</span>
-            </button>
-
-            <button 
-                disabled={isProcessing || (mode === 'file' && !currentFileBuffer)}
-                onClick={() => processAudio("Tape Stabilizer", (l, r, sr) => offlineProcessor.stabilizeTape(l, r, sr, 3150, 3000, 3300, 0.5))}
-                className={btnClass}
-            >
-                <span>Tape Stabilizer (Pitch Fix)</span>
-            </button>
-
-            <button 
-                disabled={isProcessing || (mode === 'file' && !currentFileBuffer)}
-                onClick={() => processAudio("Echo Vanish", (l, r, sr) => offlineProcessor.removeEcho(l, r, sr, 0.5, 500))}
-                className={btnClass}
-            >
-                <span>Echo Vanish (De-Reverb)</span>
-            </button>
-
-            <button 
-                disabled={isProcessing || (mode === 'file' && !currentFileBuffer)}
-                onClick={() => processAudio("Plosive Guard", (l, r, sr) => offlineProcessor.removePlosives(l, r, sr, 0.5, 0.5, 120))}
-                className={btnClass}
-            >
-                <span>Plosive Guard</span>
-            </button>
-
-            <button 
-                disabled={isProcessing || (mode === 'file' && !currentFileBuffer)}
                 onClick={() => processAudio("Mono Bass", (l, r, sr) => offlineProcessor.monoBass(l, r, sr, 120))}
                 className={btnClass}
             >

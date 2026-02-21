@@ -10,9 +10,11 @@ import { AddModuleView } from './views/AddModuleView.js';
 import { ModuleEditView } from './views/ModuleEditView.js';
 import { LoadFileView } from './views/LoadFileView.js';
 import { ExportView } from './views/ExportView.js';
+import { AnalyzerView } from './views/AnalyzerView.js';
+import { SmartAssistView } from './views/SmartAssistView.js';
 
 export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
-  const { view, setView, setRack, setPlayback, setMessage, setModuleDescriptors, playback } = useTUIStore();
+  const { view, setView, setRack, setPlayback, setMetering, setMessage, setModuleDescriptors, playback, setSuggestions } = useTUIStore();
   const { exit } = useApp();
 
   // Initial state hydration
@@ -36,12 +38,47 @@ export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
     syncInitialState();
   }, [engine, setRack, setPlayback, setMessage, setModuleDescriptors]);
 
+  // Real-time polling for playback state and meters
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const [state, meters, rack] = await Promise.all([
+          engine.getPlaybackState(),
+          engine.getMetering(),
+          engine.getRack()
+        ]);
+        
+        setPlayback(state);
+        setRack(rack);
+        
+        // Convert RMS linear values to dB for the UI
+        const toDb = (linear: number) => {
+          if (linear <= 0) return -100;
+          return 20 * Math.log10(linear);
+        };
+
+        setMetering({
+          input: toDb(meters.levels[0]),
+          output: toDb(meters.levels[1] || meters.levels[0]),
+          gainReduction: 0,
+          rack: meters.rackReduction || {},
+          fftData: meters.fftData,
+          stats: meters.stats
+        });
+      } catch (e) {
+        // Silently fail polling
+      }
+    }, 16); // 60Hz polling for maximum transient capture
+
+    return () => clearInterval(interval);
+  }, [engine, setPlayback, setMetering, setRack]);
+
   // Global Shortcuts
   useInput(async (input, key) => {
       const currentView = useTUIStore.getState().view;
       
       // Strict blocking for views that require full keyboard input
-      if (['LOAD_FILE', 'EXPORT'].includes(currentView)) return;
+      if (['LOAD_FILE', 'EXPORT', 'SMART_ASSIST'].includes(currentView)) return;
 
       // For Module Edit, we need to be careful. 
       // If we are just navigating (arrows), shortcuts are fine.
@@ -52,6 +89,30 @@ export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
       // Play/Pause - Global
       if (input === ' ') {
           await engine.togglePlay();
+          return;
+      }
+
+      // Toggle Advanced Analyzer
+      if (input === 'a' || input === 'A') {
+          if (currentView === 'ANALYZER') {
+              setView('MAIN');
+          } else {
+              setView('ANALYZER');
+          }
+          return;
+      }
+
+      // Smart Assist Trigger from Analyzer
+      if (currentView === 'ANALYZER' && (input === 'i' || input === 'I')) {
+          setSuggestions(null); // Force refresh
+          setView('SMART_ASSIST');
+          return;
+      }
+
+      // Toggle Stats Pane in Analyzer
+      if (currentView === 'ANALYZER' && key.rightArrow) {
+          const { showAnalyzerStats, setShowAnalyzerStats } = useTUIStore.getState();
+          setShowAnalyzerStats(!showAnalyzerStats);
           return;
       }
 
@@ -108,6 +169,10 @@ export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
         return <LoadFileView engine={engine} />;
       case 'EXPORT':
         return <ExportView engine={engine} />;
+      case 'ANALYZER':
+        return <AnalyzerView engine={engine} />;
+      case 'SMART_ASSIST':
+        return <SmartAssistView engine={engine} />;
       case 'MAIN':
       default:
         return <MainView engine={engine} />;

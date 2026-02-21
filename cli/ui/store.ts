@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // --- Types ---
-export type View = 'MAIN' | 'RACK' | 'ADD_MODULE' | 'MODULE_EDIT' | 'LOAD_FILE' | 'EXPORT';
+export type View = 'MAIN' | 'RACK' | 'ADD_MODULE' | 'MODULE_EDIT' | 'LOAD_FILE' | 'EXPORT' | 'ANALYZER' | 'SMART_ASSIST';
 
 export interface PlaybackState {
   isPlaying: boolean;
@@ -14,6 +14,18 @@ export interface MeteringState {
   output: number;
   gainReduction: number;
   rack: Record<string, any>;
+  fftData?: Float32Array;
+  stats?: {
+    lufs: number;
+    lra: number;
+    crest: number;
+    correlation: number;
+    width: number;
+    balance: number;
+    specLow: number;
+    specMid: number;
+    specHigh: number;
+  };
 }
 
 export interface ModuleDescriptor {
@@ -35,6 +47,8 @@ export interface TUIState {
   message: string;
   isExporting: boolean;
   moduleDescriptors: Record<string, ModuleDescriptor>;
+  showAnalyzerStats: boolean;
+  suggestions: any[] | null;
   
   // Actions
   setView: (view: View) => void;
@@ -45,6 +59,8 @@ export interface TUIState {
   setMessage: (message: string, duration?: number) => void;
   setIsExporting: (isExporting: boolean) => void;
   setModuleDescriptors: (descriptors: Record<string, ModuleDescriptor>) => void;
+  setShowAnalyzerStats: (show: boolean) => void;
+  setSuggestions: (suggestions: any[] | null) => void;
 }
 
 export const useTUIStore = create<TUIState>((set, get) => ({
@@ -52,11 +68,13 @@ export const useTUIStore = create<TUIState>((set, get) => ({
   view: 'MAIN',
   rack: [],
   playback: { isPlaying: false, currentTime: 0, duration: 0 },
-  metering: { input: -60, output: -60, gainReduction: 0, rack: {} },
+  metering: { input: -60, output: -60, gainReduction: 0, rack: {}, fftData: new Float32Array(0) },
   selectedModuleId: null,
   message: '',
   isExporting: false,
   moduleDescriptors: {},
+  showAnalyzerStats: true,
+  suggestions: null,
 
   // --- Actions ---
   setView: (view) => set({ view }),
@@ -76,4 +94,6 @@ export const useTUIStore = create<TUIState>((set, get) => ({
   },
   setIsExporting: (isExporting) => set({ isExporting }),
   setModuleDescriptors: (descriptors) => set({ moduleDescriptors: descriptors }),
+  setShowAnalyzerStats: (show) => set({ showAnalyzerStats: show }),
+  setSuggestions: (suggestions) => set({ suggestions }),
 }));
