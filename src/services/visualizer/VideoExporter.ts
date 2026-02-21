@@ -32,7 +32,13 @@ class VideoExporterService {
     });
   }
 
-  public async renderAndEncode(audio: Blob, options: RenderOptions, templateId: string, onProgress?: (p: RenderProgress) => void): Promise<Blob> {
+  public async renderAndEncode(
+      audio: Blob, 
+      options: RenderOptions, 
+      templateId: string, 
+      analysisData?: Float32Array[],
+      onProgress?: (p: RenderProgress) => void
+  ): Promise<Blob> {
     if (!this.worker) await this.init();
     
     this.onProgressCallback = onProgress || null;
@@ -61,7 +67,7 @@ class VideoExporterService {
       this.worker?.addEventListener('message', handler);
       this.worker?.postMessage({
         type: 'renderAndEncode',
-        payload: { audio, options, templateId }
+        payload: { audio, options, templateId, analysisData }
       });
     });
   }

@@ -1,3 +1,5 @@
+// src/services/visualizer/types.ts
+
 export interface RenderProgress {
   stage: 'analyzing' | 'rendering' | 'encoding' | 'complete' | 'error';
   progress: number; // 0-1
@@ -20,7 +22,15 @@ export interface VisualizerTemplate {
 }
 
 export interface EncodeJob {
-  frames: Blob[]; // Array of image blobs (PNG/JPEG)
+  frames: Blob[]; // Legacy
   audio: Blob;    // Audio blob (WAV/MP3)
   options: RenderOptions;
+  templateId?: string;
+}
+
+export interface RenderJobPayload {
+    audio: Blob;
+    options: RenderOptions;
+    templateId: string;
+    analysisData?: Float32Array[]; // Array of FFT frames (one per video frame)
 }

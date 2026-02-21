@@ -22,7 +22,7 @@ self.onmessage = async (e) => {
         break;
       case 'renderAndEncode':
         // New render-loop based encode
-        await renderAndEncode(payload.audio, payload.options, payload.templateId);
+        await renderAndEncode(payload.audio, payload.options, payload.templateId, payload.analysisData);
         break;
       default:
         console.warn('Unknown message type:', type);
@@ -41,17 +41,16 @@ async function initFFmpeg() {
   await ffmpeg.load();
 }
 
-// Helper to generate dummy analysis data (Step 2 placeholder)
+// Fallback if no analysis data provided
 function getMockAnalysisData(time: number, length: number): Float32Array {
     const data = new Float32Array(length);
     for (let i = 0; i < length; i++) {
-        // Simple sine wave + noise
         data[i] = Math.sin(i * 0.1 + time * 10) * 0.5 + Math.random() * 0.1;
     }
     return data;
 }
 
-async function renderAndEncode(audioBlob: Blob, options: RenderOptions, templateId: string) {
+async function renderAndEncode(audioBlob: Blob, options: RenderOptions, templateId: string, analysisData?: Float32Array[]) {
     if (!ffmpeg) throw new Error('FFmpeg not initialized');
     const { width, height, fps } = options;
     
@@ -69,18 +68,14 @@ async function renderAndEncode(audioBlob: Blob, options: RenderOptions, template
     await ffmpeg.writeFile(audioName, audioData);
 
     // 3. Render Loop
-    // Determine duration from audio size (rough estimate for PCM 16bit stereo 44.1k)
-    // 1 sec = 44100 * 2 * 2 = 176400 bytes
-    // This is just an estimate for the progress bar if we don't parse the header.
-    // For now, let's render 5 seconds fixed for testing if duration isn't passed.
-    const duration = 5; // TODO: Parse WAV header or pass duration
-    const totalFrames = duration * fps;
+    // Use analysis length if available, otherwise estimate from blob
+    const totalFrames = analysisData ? analysisData.length : fps * 5; // Default 5s if no data
     
     console.log(`Rendering ${totalFrames} frames for template ${templateId}...`);
 
     for (let i = 0; i < totalFrames; i++) {
         const time = i / fps;
-        const data = getMockAnalysisData(time, 128); // 128 bins
+        const data = analysisData && analysisData[i] ? analysisData[i] : getMockAnalysisData(time, 128);
         
         // Select Renderer
         if (templateId === 'spectrum') {
@@ -115,7 +110,10 @@ async function renderAndEncode(audioBlob: Blob, options: RenderOptions, template
         '-preset', 'ultrafast',
         '-pix_fmt', 'yuv420p',
         '-c:a', 'aac',
-        '-t', String(duration), // Limit to duration
+        // If we have exact frames, we rely on frames to define length, but audio might be longer.
+        // -shortest ensures video stops when frames stop (or audio).
+        // Since we generated frames for exact duration, -shortest is safe.
+        '-shortest', 
         outputName
     ];
 
@@ -123,8 +121,6 @@ async function renderAndEncode(audioBlob: Blob, options: RenderOptions, template
 
     // 5. Output
     const data = await ffmpeg.readFile(outputName);
-    // Ensure we copy to a standard ArrayBuffer if it's shared, or just pass it if supported.
-    // TS complains about SharedArrayBuffer in Blob, so we cast to any or copy.
     const resultBlob = new Blob([data as any], { type: 'video/mp4' });
     self.postMessage({ type: 'complete', blob: resultBlob });
 }

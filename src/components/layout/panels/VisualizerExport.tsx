@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { VideoExporter } from '@/services/visualizer/VideoExporter';
+import { AudioAnalyzer } from '@/services/visualizer/AudioAnalyzer';
 import { RenderProgress } from '@/services/visualizer/types';
 
 export const VisualizerExport: React.FC = () => {
@@ -31,12 +32,25 @@ export const VisualizerExport: React.FC = () => {
       writeString(view, 36, 'data');
       view.setUint32(40, numSamples * 2, true);
 
+      // Add a sine wave so we can see something
+      const dataOffset = 44;
+      for (let i = 0; i < numSamples; i++) {
+          const t = i / sampleRate;
+          const val = Math.sin(2 * Math.PI * 440 * t); // 440Hz
+          const s = Math.max(-1, Math.min(1, val));
+          view.setInt16(dataOffset + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+
       return new Blob([buffer], { type: 'audio/wav' });
   };
 
   const handleExport = async () => {
     try {
       const audioBlob = await generateDummyAudio();
+      const fps = 30;
+      
+      setStatus('Analyzing Audio...');
+      const analysisData = await AudioAnalyzer.analyze(audioBlob, fps);
       
       setStatus('Initializing FFmpeg...');
       await VideoExporter.init();
@@ -45,9 +59,9 @@ export const VisualizerExport: React.FC = () => {
       const blob = await VideoExporter.renderAndEncode(audioBlob, {
         width: 1080, // Portrait HD
         height: 1920,
-        fps: 30,
+        fps,
         bitrate: 4000
-      }, template, (p: RenderProgress) => {
+      }, template, analysisData, (p: RenderProgress) => {
         setStatus(`Stage: ${p.stage} - ${(p.progress * 100).toFixed(1)}%`);
         setProgress(p.progress);
       });
@@ -93,9 +107,9 @@ export const VisualizerExport: React.FC = () => {
       <button
         onClick={handleExport}
         className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-semibold disabled:opacity-50 w-full"
-        disabled={status.startsWith('Stage') || status.startsWith('Initializing') || status.startsWith('Starting')}
+        disabled={status.startsWith('Stage') || status.startsWith('Initializing') || status.startsWith('Starting') || status.startsWith('Analyzing')}
       >
-        Render 5s Preview
+        Render 2s Test (440Hz Sine)
       </button>
 
       {videoUrl && (
