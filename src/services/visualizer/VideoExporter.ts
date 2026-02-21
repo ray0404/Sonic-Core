@@ -32,6 +32,40 @@ class VideoExporterService {
     });
   }
 
+  public async renderAndEncode(audio: Blob, options: RenderOptions, templateId: string, onProgress?: (p: RenderProgress) => void): Promise<Blob> {
+    if (!this.worker) await this.init();
+    
+    this.onProgressCallback = onProgress || null;
+
+    return new Promise((resolve, reject) => {
+      const handler = (e: MessageEvent) => {
+        const { type, blob, error, progress, stage } = e.data;
+
+        if (type === 'complete') {
+          this.worker?.removeEventListener('message', handler);
+          resolve(blob);
+        } else if (type === 'error') {
+          this.worker?.removeEventListener('message', handler);
+          reject(new Error(error));
+        } else if (type === 'progress') {
+            if (this.onProgressCallback) {
+                this.onProgressCallback({
+                    stage: stage || 'rendering',
+                    progress: progress || 0,
+                    message: stage
+                });
+            }
+        }
+      };
+
+      this.worker?.addEventListener('message', handler);
+      this.worker?.postMessage({
+        type: 'renderAndEncode',
+        payload: { audio, options, templateId }
+      });
+    });
+  }
+
   public async encode(frames: Blob[], audio: Blob, options: RenderOptions, onProgress?: (p: RenderProgress) => void): Promise<Blob> {
     if (!this.worker) await this.init();
     
