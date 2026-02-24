@@ -27,6 +27,103 @@ function getWasmPath() {
 }
 
 program
+  .command('process')
+  .description('Process an audio file using Sonic Forge DSP chain')
+  .argument('<input>', 'Input audio file')
+  .option('-o, --output <path>', 'Output path for processed audio')
+  .option('-af, --audio-filters <string>', 'FFmpeg-style audio filter chain (e.g. "compressor=threshold=-24:ratio=4")')
+  .option('-c, --config <path>', 'Path to a JSON configuration file for the DSP chain')
+  .option('-p, --preview', 'Preview the audio stream in real-time')
+  .option('-ss, --start <number>', 'Start time for preview (seconds)', '0')
+  .option('--ab', 'Enable A/B comparison mode during preview')
+  .option('-b:a, --bitrate <string>', 'Output audio bitrate (e.g. 320k)', '320k')
+  .option('-ar, --samplerate <number>', 'Output sample rate', '44100')
+  .option('-ac, --channels <number>', 'Output channels', '2')
+  .option('--param <strings...>', 'Override module parameters (e.g. "0:threshold=-12" or "compressor:ratio=8")')
+  .action(async (input, options) => {
+    const wasmPath = getWasmPath();
+    if (!fs.existsSync(wasmPath)) {
+        console.error(`Error: Could not find DSP WASM at "${wasmPath}".`);
+        process.exit(1);
+    }
+
+    const { processAudio } = await import('./process.js');
+    try {
+        await processAudio({
+            input,
+            output: options.output,
+            filters: options.audioFilters,
+            config: options.config,
+            wasmPath,
+            preview: options.preview,
+            start: parseFloat(options.start),
+            abCompare: options.ab,
+            params: options.param,
+            bitrate: options.bitrate,
+            sampleRate: options.samplerate,
+            channels: options.channels
+        });
+        
+        if (!options.preview) {
+            process.exit(0);
+        }
+    } catch (error) {
+        console.error('Processing Error:', error);
+        process.exit(1);
+    }
+  });
+
+program
+  .command('analyze')
+  .description('Analyze an audio file and suggest a DSP rack')
+  .argument('<input>', 'Input audio file')
+  .action(async (input) => {
+    const wasmPath = getWasmPath();
+    if (!fs.existsSync(wasmPath)) {
+        console.error(`Error: Could not find DSP WASM at "${wasmPath}".`);
+        process.exit(1);
+    }
+
+    try {
+        const engine = new NativeEngine(wasmPath);
+        await engine.init();
+        
+        const audioBuffer = fs.readFileSync(input);
+        await engine.loadAudio(audioBuffer);
+        
+        console.log(`Analyzing: ${path.basename(input)}...`);
+        const suggestions = await engine.getSuggestions();
+        
+        if (suggestions.length === 0) {
+            console.log('No specific suggestions for this file.');
+        } else {
+            console.log('\nSuggested DSP Rack:');
+            suggestions.forEach((s, i) => {
+                console.log(`${i + 1}. ${s.type}`);
+                if (s.parameters && Object.keys(s.parameters).length > 0) {
+                    Object.entries(s.parameters).forEach(([k, v]) => {
+                        console.log(`   - ${k}: ${v}`);
+                    });
+                }
+            });
+            console.log('\nYou can apply this using:');
+            const filterStr = suggestions.map(s => {
+                let pStr = '';
+                if (s.parameters) {
+                    pStr = '=' + Object.entries(s.parameters).map(([k, v]) => `${k}=${v}`).join(':');
+                }
+                return `${s.type.toLowerCase().replace(/_/g, '-')}${pStr}`;
+            }).join(',');
+            console.log(`sonicforge process "${input}" -af "${filterStr}" -p`);
+        }
+        process.exit(0);
+    } catch (error) {
+        console.error('Analysis Error:', error);
+        process.exit(1);
+    }
+  });
+
+program
   .command('start')
   .description('Start the Interactive TUI')
   .option('-d, --debug', 'Enable debug logging')

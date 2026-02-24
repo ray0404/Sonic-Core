@@ -35,6 +35,7 @@ export class NativeEngine implements SonicEngine {
     peakLevels: [0, 0],
     fftData: new Float32Array(128).fill(0)
   };
+  private abMode: 'A' | 'B' = 'B';
   private playbackInterval: NodeJS.Timeout | null = null;
   private grEnvelopes: Map<string, Float32Array> = new Map();
   private cacheStack: { id: string, buffer: Float32Array, grEnvelopes: Map<string, Float32Array> }[] = [];
@@ -608,13 +609,18 @@ export class NativeEngine implements SonicEngine {
 
         let canWrite = true;
         while (canWrite && this.isPlaying) {
+            const bufferToUse = this.abMode === 'A' ? this.sourceBuffer : this.processedBuffer;
+            if (!bufferToUse) return;
+
+            const totalSamples = bufferToUse.length;
             const endSample = Math.min(currentSample + chunkSize * this.numChannels, totalSamples);
+            
             if (currentSample >= totalSamples) {
                 this.playbackProcess.stdin.end();
                 return;
             }
 
-            const chunk = this.processedBuffer!.slice(currentSample, endSample);
+            const chunk = bufferToUse.slice(currentSample, endSample);
             
             // Update metering for every chunk to capture all transients
             this.updateMetering(chunk);
@@ -768,5 +774,9 @@ export class NativeEngine implements SonicEngine {
 
   async close() {
     this.stopPlayback();
+  }
+
+  setABMode(mode: 'A' | 'B') {
+    this.abMode = mode;
   }
 }

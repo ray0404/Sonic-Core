@@ -61,4 +61,15 @@ describe('NativeEngine', () => {
     expect(data.stats!.width).toBe(0);
     expect(data.levels[0]).toBeLessThan(0.0001); // Should be mapped from -100dB
   });
+
+  it('should support A/B mode toggling', () => {
+    // @ts-ignore
+    expect(engine.abMode).toBe('B'); // Default processed
+    engine.setABMode('A');
+    // @ts-ignore
+    expect(engine.abMode).toBe('A');
+    engine.setABMode('B');
+    // @ts-ignore
+    expect(engine.abMode).toBe('B');
+  });
 });
