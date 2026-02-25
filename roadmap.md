@@ -21,3 +21,15 @@ This roadmap outlines the transition of Sonic-Core from a linear rack-based work
 *   **Blueprint:** `blueprint-feat3.md`
 *   **Key Tech:** React Flow, Directed Acyclic Graph (DAG) state, Parallel Engine Architecture.
 *   **Status:** Planned.
+
+### Phase 4: Developer Velocity - "SonicForge" Autogen (Forge-to-Worklet Bridge)
+**Goal:** Automate the "Trinity Pattern" boilerplate generation (Zig → TypeScript → React) to rapidly scale the DSP processor library with zero friction.
+*   **Blueprint:** `blueprint-feat4.md`
+*   **Key Tech:** Node.js/Python Parsing, AST Generation, AST-driven AST Code Generation, Template Literals, Zig metadata parsing.
+*   **Status:** Planned.
+
+### Phase 5: Engine Foundation - "Sonic-STL" (Standard Transform Library)
+**Goal:** Standardize core DSP algorithms (FFT, Windowing, Resampling) at the Zig compile-time level to ensure high performance, consistency, and zero-drift computation across 40+ plugins.
+*   **Blueprint:** `blueprint-feat5.md`
+*   **Key Tech:** Zig `comptime`, Fixed-size Compile-time FFTs, Math primitives optimization.
+*   **Status:** Planned.

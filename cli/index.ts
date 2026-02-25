@@ -2,11 +2,7 @@
 import { Command } from 'commander';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { NativeEngine } from './engine/native-engine.js';
-import { runTUI } from './ui/index.js';
 import fs from 'fs';
-import { exportPlugin } from './plugins/export.js';
-import { Director } from './engine/director.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const program = new Command();
@@ -14,7 +10,18 @@ const program = new Command();
 program
   .name('sonicforge')
   .description('Sonic Forge CLI & TUI')
-  .version('0.1.0');
+  .version('0.1.0')
+  .helpCommand('help [command]', 'Display help for command')
+  .addHelpText('after', `
+INTERACTIVE CONTROLS (TUI / Preview)
+  Space         Toggle Play/Pause
+  Left/Right    Seek -5s/+5s
+  a / b         Switch between Original (A) and Processed (B)
+  q             Quit
+
+SEE ALSO
+  ffmpeg(1), ffplay(1)
+`);
 
 function getWasmPath() {
     const isRunningFromDist = __dirname.includes(path.join('dist', 'cli'));
@@ -31,14 +38,14 @@ program
   .description('Process an audio file using Sonic Forge DSP chain')
   .argument('<input>', 'Input audio file')
   .option('-o, --output <path>', 'Output path for processed audio')
-  .option('-af, --audio-filters <string>', 'FFmpeg-style audio filter chain (e.g. "compressor=threshold=-24:ratio=4")')
+  .option('--af, --audio-filters <string>', 'FFmpeg-style audio filter chain (e.g. "compressor=threshold=-24:ratio=4")')
   .option('-c, --config <path>', 'Path to a JSON configuration file for the DSP chain')
   .option('-p, --preview', 'Preview the audio stream in real-time')
-  .option('-ss, --start <number>', 'Start time for preview (seconds)', '0')
+  .option('--ss, --start <number>', 'Start time for preview (seconds)', '0')
   .option('--ab', 'Enable A/B comparison mode during preview')
-  .option('-b:a, --bitrate <string>', 'Output audio bitrate (e.g. 320k)', '320k')
-  .option('-ar, --samplerate <number>', 'Output sample rate', '44100')
-  .option('-ac, --channels <number>', 'Output channels', '2')
+  .option('--bitrate <string>', 'Output audio bitrate (e.g. 320k)', '320k')
+  .option('--samplerate <number>', 'Output sample rate', '44100')
+  .option('--channels <number>', 'Output channels', '2')
   .option('--param <strings...>', 'Override module parameters (e.g. "0:threshold=-12" or "compressor:ratio=8")')
   .action(async (input, options) => {
     const wasmPath = getWasmPath();
@@ -85,6 +92,7 @@ program
     }
 
     try {
+        const { NativeEngine } = await import('./engine/native-engine.js');
         const engine = new NativeEngine(wasmPath);
         await engine.init();
         
@@ -139,6 +147,9 @@ program
     }
 
     try {
+      const { NativeEngine } = await import('./engine/native-engine.js');
+      const { runTUI } = await import('./ui/index.js');
+      
       const engine = new NativeEngine(wasmPath);
       await engine.init();
       if (options.debug) console.log('Engine Connected.');
@@ -176,6 +187,7 @@ program
     }
 
     try {
+        const { Director } = await import('./engine/director.js');
         const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
         const director = new Director(wasmPath);
         

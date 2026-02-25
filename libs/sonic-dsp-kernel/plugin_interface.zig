@@ -1,5 +1,20 @@
 const std = @import("std");
 
+pub const ParameterMeta = struct {
+    name: []const u8,
+    label: []const u8,
+    min: f32,
+    max: f32,
+    default_val: f32,
+    unit: []const u8 = "",
+};
+
+pub const PluginMeta = struct {
+    id: []const u8,
+    name: []const u8,
+    parameters: []const ParameterMeta,
+};
+
 pub const PluginInterface = struct {
     /// Create a new instance of the plugin
     create: *const fn (allocator: std.mem.Allocator, sample_rate: f32) ?*anyopaque,

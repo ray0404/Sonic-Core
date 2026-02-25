@@ -86,7 +86,8 @@ export default defineConfig({
     include: [
       'src/**/*.{test,spec}.{ts,tsx,js,jsx}', 
       'packages/sonic-core/src/**/*.{test,spec}.{ts,tsx,js,jsx}',
-      'cli/**/*.test.{ts,tsx}'
+      'cli/**/*.test.{ts,tsx}',
+      'scripts/**/*.test.{ts,tsx}'
     ],
   },
 })

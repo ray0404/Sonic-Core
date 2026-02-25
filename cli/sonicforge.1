@@ -1,0 +1,62 @@
+.TH SONICFORGE 1 "February 2026" "0.1.0" "Sonic Forge CLI Manual"
+.SH NAME
+sonicforge \- high-performance audio processing CLI and TUI
+.SH SYNOPSIS
+.B sonicforge
+[\fIcommand\fR] [\fIoptions\fR] [\fIarguments\fR]
+.SH DESCRIPTION
+.B sonicforge
+is a professional-grade audio processing utility that bridges the gap between high-performance DSP (Zig/WASM) and a flexible command-line interface. It supports real-time TUI interaction, chained audio filters, and batch processing.
+.SH COMMANDS
+.TP
+.B process \fIinput\fR [\fIoptions\fR]
+Process an audio file through a DSP chain.
+.TP
+.B analyze \fIinput\fR
+Analyze audio content and suggest an optimized DSP rack.
+.TP
+.B start
+Launch the interactive Terminal User Interface (TUI).
+.TP
+.B director \fImanifest\fR \fIinput_dir\fR \fIoutput_dir\fR
+Batch process multiple files using a JSON manifest.
+.TP
+.B modules list
+List all available DSP modules and their parameters.
+.TP
+.B help [\fIcommand\fR]
+Display help for sonicforge or a specific command.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Display help for sonicforge.
+.TP
+.B \-\-af, \-\-audio-filters \fIstring\fR
+Define a filter chain (e.g., "compressor=threshold=-24,saturation=drive=0.5").
+.TP
+.B \-p, \-\-preview
+Enable real-time audio preview.
+.TP
+.B \-\-ab
+Enable A/B comparison mode during preview ('a' for original, 'b' for processed).
+.TP
+.B \-\-ss, \-\-start \fIseconds\fR
+Start playback from a specific timestamp.
+.TP
+.B \-\-param \fIid:param=value\fR
+Override specific module parameters by index or type.
+.SH INTERACTIVE CONTROLS
+.IP \[bu] 2
+.B Space
+\- Toggle Play/Pause
+.IP \[bu] 2
+.B Left/Right
+\- Seek -5s/+5s
+.IP \[bu] 2
+.B a / b
+\- Switch between Original (A) and Processed (B)
+.IP \[bu] 2
+.B q
+\- Quit
+.SH SEE ALSO
+ffmpeg(1), ffplay(1)

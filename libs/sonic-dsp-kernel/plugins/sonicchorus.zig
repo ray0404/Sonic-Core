@@ -1,5 +1,18 @@
 const std = @import("std");
 const time = @import("../modules/time.zig");
+const plugin_interface = @import("../plugin_interface.zig");
+
+pub const metadata = plugin_interface.PluginMeta{
+    .id = "chorus",
+    .name = "Chorus",
+    .parameters = &[_]plugin_interface.ParameterMeta{
+        .{ .name = "frequency", .label = "Rate", .min = 0.1, .max = 10.0, .default_val = 1.5, .unit = "Hz" },
+        .{ .name = "base_time", .label = "Delay", .min = 0.001, .max = 0.05, .default_val = 0.03, .unit = "s" },
+        .{ .name = "depth", .label = "Depth", .min = 0.0, .max = 0.01, .default_val = 0.002, .unit = "s" },
+        .{ .name = "feedback", .label = "Feed", .min = 0.0, .max = 0.95, .default_val = 0.0, .unit = "" },
+        .{ .name = "wet", .label = "Mix", .min = 0.0, .max = 1.0, .default_val = 0.5, .unit = "" },
+    }
+};
 
 pub const ChorusPlugin = struct {
     chorus: time.Chorus,
