@@ -9,7 +9,7 @@
     "predev": "npm run build:wasm",
     "dev": "npm run copy-docs && vite",
     "build": "npm run copy-docs && tsc && vite build",
-    "build:wasm": "zig build-exe libs/sonic-dsp-kernel/main.zig -target wasm32-freestanding -rdynamic -fno-entry -O ReleaseFast -femit-bin=public/wasm/dsp.wasm",
+    "build:wasm": "zig build-exe libs/sonic-dsp-kernel/main.zig -target wasm32-freestanding -mcpu=generic+simd128+relaxed_simd -rdynamic -fno-entry -O ReleaseFast -femit-bin=public/wasm/dsp.wasm",
     "prebuild:cli": "npm run build:wasm && npm run forge:generate",
     "build:cli": "npm run build && tsc -p tsconfig.cli.json && mkdir -p dist/cli/cli/wasm && cp public/wasm/dsp.wasm dist/cli/cli/wasm/dsp.wasm",
     "predev:cli": "npm run build:wasm",

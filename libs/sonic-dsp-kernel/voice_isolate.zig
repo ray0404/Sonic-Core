@@ -1,5 +1,7 @@
 const std = @import("std");
 const math = @import("math_utils.zig");
+const Fft = @import("dsp/fft.zig").Fft;
+const HanningWindow = @import("dsp/window.zig").HanningWindow;
 
 // Use the same allocator as main
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -133,16 +135,11 @@ pub fn process_voiceisolate(ptr: [*]f32, len: usize, amount: f32) void {
     defer allocator.free(output_buf);
     @memset(output_buf, 0);
 
-    const window = allocator.alloc(f32, WINDOW_SIZE) catch return;
-    defer allocator.free(window);
-
     const magnitudes = allocator.alloc(f32, WINDOW_SIZE / 2) catch return;
     defer allocator.free(magnitudes);
 
-    // Hanning Window
-    for (window, 0..) |_, idx| {
-        window[idx] = 0.5 * (1.0 - std.math.cos(math.TWO_PI * @as(f32, @floatFromInt(idx)) / @as(f32, @floatFromInt(WINDOW_SIZE - 1))));
-    }
+    const MyFft = Fft(WINDOW_SIZE);
+    const Win = HanningWindow(WINDOW_SIZE);
 
     var model = VoiceIsolateModel.init();
     var band_energies: [NUM_BANDS]f32 = undefined;
@@ -154,11 +151,11 @@ pub fn process_voiceisolate(ptr: [*]f32, len: usize, amount: f32) void {
 
         // A. Windowing
         for (0..WINDOW_SIZE) |k| {
-            fft_buf[k] = .{ .re = data[pos + k] * window[k], .im = 0 };
+            fft_buf[k] = .{ .re = data[pos + k] * Win.window[k], .im = 0 };
         }
 
         // B. FFT
-        math.fft_iterative(fft_buf, false);
+        MyFft.forward(@as(*[WINDOW_SIZE]std.math.Complex(f32), @ptrCast(fft_buf.ptr)));
 
         // C. Feature Extraction (Magnitude -> Bands)
         // We need magnitude for bands, but we work on complex for reconstruction
@@ -183,11 +180,11 @@ pub fn process_voiceisolate(ptr: [*]f32, len: usize, amount: f32) void {
         apply_band_gains(fft_buf, &band_gains);
 
         // F. IFFT
-        math.fft_iterative(fft_buf, true);
+        MyFft.inverse(@as(*[WINDOW_SIZE]std.math.Complex(f32), @ptrCast(fft_buf.ptr)));
 
         // G. Overlap-Add
         for (0..WINDOW_SIZE) |k| {
-            output_buf[pos + k] += fft_buf[k].re * window[k]; // Apply window again (Hanning^2 sums to constant)
+            output_buf[pos + k] += fft_buf[k].re * Win.window[k]; // Apply window again (Hanning^2 sums to constant)
         }
     }
 
