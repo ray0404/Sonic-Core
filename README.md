@@ -30,7 +30,8 @@ Sonic-Core is designed as a **Universal Audio Platform**, featuring a standalone
 ## ✨ Key Features
 
 - **🚀 Zero-Latency Real-Time Processing**: Highly optimized AudioWorklet processors and modular WebAudio graphs.
-- **🛠️ Smart Offline DSP**: High-performance audio repair and normalization engine written in Zig and compiled to WebAssembly.
+- **🛠️ Smart Offline DSP**: High-performance audio repair and normalization engine written in Zig and compiled to WebAssembly. Powered by the **Sonic-STL**, utilizing hardware SIMD acceleration and `comptime` FFT optimizations.
+- **⚡ Developer Velocity**: "SonicForge" Autogen completely eliminates boilerplate by parsing Zig metadata to automatically generate TypeScript WebAudio Nodes and React UI controls.
 - **🎸 Creative Suite**: Full Guitar Rig (Amps/Cabs), standalone stompboxes, Drum Machine, and Tab Player.
 - **🤖 AI Jam Session**: Gemini-powered co-pilot for generating backing tracks and matching guitar tones from text prompts.
 - **🔒 Local-First & Privacy-Centric**: All audio data stays on the user's device. No cloud uploads for processing.
@@ -145,6 +146,8 @@ The **Creative Studio** panel leverages AI to streamline your workflow:
 1.  **Automated Social Export**: Instantly render frequency-reactive WebGL videos for TikTok/Instagram.
 2.  **VST/AU Desktop Bridge**: Connect the PWA to native desktop plugins via a local companion app.
 3.  **Visual Node Graph**: Alternative routing view using "wires" for complex serial/parallel chains.
+4.  **"SonicForge" Autogen**: Automated DSP boilerplate generation (Completed).
+5.  **"Sonic-STL" Foundation**: High-performance compile-time transform library (Completed).
 
 ---
 

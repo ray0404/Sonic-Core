@@ -8,7 +8,8 @@ Sonic-Core transforms the concept of a "web-based DAW" into a **Universal Audio 
 
 ### Core Technology Stack
 - **Engine Core**: TypeScript 5.x (Headless, Command-driven)
-- **DSP Kernel**: Zig 0.13.0 (Compiled to WebAssembly)
+- **DSP Kernel**: Zig 0.13.0 (Compiled to WebAssembly with SIMD128 and Relaxed SIMD hardware acceleration)
+- **Sonic-STL**: Standard Transform Library providing `comptime` FFTs and Vector Math
 - **Creative Suite**: TypeScript/WebAudio Modular Graph
 - **AI Integration**: Google Gemini 2.5 (Jam Blueprinting, Tone Matching)
 - **Web UI**: React 18, Zustand, Tailwind CSS, Vite
@@ -74,11 +75,17 @@ A dedicated wrapper system that allows exporting Sonic-Core DSP logic as native 
 
 ## 📏 Development Conventions
 
-### The "Trinity Pattern"
-To add a new real-time effect, you must implement:
-1.  **DSP Processor/Logic**: Located in `worklets/` or `creative/`.
-2.  **Node Wrapper**: `packages/sonic-core/src/worklets/[Name]Node.ts`.
-3.  **UI Unit**: `src/components/rack/[Name]Unit.tsx`.
+### The "Trinity Pattern" & Autogen
+To add a new real-time effect, you previously had to manually implement three files. This is now automated via **SonicForge Autogen**:
+1.  **DSP Logic & Metadata**: Write the processing logic in `libs/sonic-dsp-kernel/plugins/` and export a `PluginMeta` struct containing parameter definitions.
+2.  **Generate**: Run `npm run forge:generate` (or allow the build system to trigger it).
+3.  **Result**: The script automatically parses the Zig metadata and scaffolds the corresponding TypeScript Node Wrapper (`packages/sonic-core/src/worklets/Auto[Name]Node.ts`) and React UI Unit (`src/components/rack/Auto[Name]Unit.tsx`).
+
+### Sonic-STL (Standard Transform Library)
+All new DSP features should utilize the robust math primitives located in `libs/sonic-dsp-kernel/dsp/`:
+- **Vector Math**: Use `vector_math.zig` (`@Vector(4, f32)`) for SIMD-accelerated array processing.
+- **FFT**: Use the `Fft(N)` module from `fft.zig` for `comptime` calculated bit-reversal and twiddle factors to save runtime CPU cycles.
+- **Windowing**: Use `window.zig` to generate `comptime` arrays for Overlap-Add applications.
 
 ---
 *Last Updated: February 2026*

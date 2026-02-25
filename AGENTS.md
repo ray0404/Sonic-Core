@@ -57,13 +57,18 @@ Sonic-Core follows a strict **Three-Layer Architecture**:
 
 ## 4. Key Workflows & Features
 
-### A. Modular Rack ("The Trinity Pattern")
-Adding a new effect requires three components:
-1.  **Processor/Logic:** Located in `worklets/` (JS) or `creative/` (TS).
-2.  **Node (Bridge):** Wrapper in `packages/sonic-core/src/worklets/[Name]Node.ts`.
-3.  **UI (Component):** `src/components/rack/[Name]Unit.tsx`.
+### A. Modular Rack ("The Trinity Pattern") & Autogen
+Adding a new effect previously required manual syncing across three components. With **Phase 4: SonicForge Autogen**, this workflow is heavily automated:
+1.  **Processor/Logic (Zig):** Define the DSP math in `libs/sonic-dsp-kernel/plugins/sonic[name].zig`.
+2.  **Metadata (Zig):** Export a `PluginMeta` struct containing parameter bounds, defaults, and units.
+3.  **Autogen (`forge:generate`):** Running this script parses the Zig metadata and automatically generates the TypeScript Worklet Node wrapper and the React UI component (`[Name]Unit.tsx`).
 
-### B. Creative Suite
+### B. Engine Foundation (Sonic-STL)
+The DSP processing layer relies on the **Sonic-STL (Standard Transform Library)**. This provides highly robust, `comptime`-optimized mathematical primitives:
+*   **SIMD Acceleration:** Core arrays leverage Zig's `@Vector(4, f32)` for hardware-accelerated processing via `-mcpu=generic+simd128+relaxed_simd`.
+*   **Comptime FFTs & Windowing:** Fast Fourier Transforms and Hanning windows are pre-calculated at compile-time to eliminate runtime trigonometric overhead.
+
+### C. Creative Suite
 *   **Guitar Rig:** 4 Amp models (Clean, Crunch, Modern, Bass) + IR Cabinet Simulator.
 *   **Standalone Stompboxes:** Individual pedal modules (Chorus, Delay, Reverb, Overdrive, etc.) that can be placed anywhere in the signal chain.
 *   **Production Tools:** Synthesized Drum Machine, Tab Player (MIDI-style playback), and high-precision Tuner/Metronome.
@@ -113,3 +118,5 @@ Sonic-Core/
 1.  **Distribution:** Automated Social Visualizer Export (FFmpeg.wasm).
 2.  **Integration:** Local Plugin Wrapper (VST3/AU Desktop Bridge).
 3.  **UX Evolution:** Reactive Node Graph View (Visual "wire" routing).
+4.  **Developer Velocity:** "SonicForge" Autogen (Completed).
+5.  **Engine Foundation:** "Sonic-STL" Standard Transform Library (Completed).
