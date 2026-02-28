@@ -16,30 +16,15 @@ pub const GainPlugin = struct {
     }
 
     pub fn process(self: *GainPlugin, inputs: [*]const [*]const f32, outputs: [*][*]f32, frames: usize) void {
-        // Assume stereo or check buffers? 
-        // For simplicity, handle whatever is passed (assumes valid pointers).
-        // In VST3 wrapper we will ensure valid pointers.
-        
-        // Simple passthrough + gain
-        // We'll process channel 0 and 1 if available.
-        // Actually, inputs is [*]const [*]const f32, which is essentially float**.
-        
         const in_l = inputs[0];
+        const in_r = inputs[1];
         const out_l = outputs[0];
+        const out_r = outputs[1];
         
-        // Check if stereo
-        // We really need num_channels passed in process or fixed at creation.
-        // Let's assume Stereo for this VST3 proof-of-concept.
-        
-        var i: usize = 0;
-        while (i < frames) : (i += 1) {
+        for (0..frames) |i| {
             out_l[i] = in_l[i] * self.gain;
+            out_r[i] = in_r[i] * self.gain;
         }
-
-        // Handle second channel if likely exists (wrapper should ensure)
-        // We'll just mirror L to R if input R is missing or pass R if present.
-        // Ideally we check a channel_count.
-        // For now, let's just do Channel 0.
     }
 
     pub fn setParameter(self: *GainPlugin, index: i32, value: f32) void {

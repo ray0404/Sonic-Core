@@ -124,6 +124,15 @@ export fn process_dithering(ptr: [*]f32, len: usize, bits: f32) void {
     creative.processDithering(ptr[0..len], bits);
 }
 
+// --- Gain Module ---
+
+export fn process_gain(ptr: [*]f32, len: usize, gain: f32) void {
+    const data = ptr[0..len];
+    for (data) |*sample| {
+        sample.* *= gain;
+    }
+}
+
 // --- 1. Loudness Normalization (EBU R128 Style approximation) ---
 
 fn apply_filter(input: []f32, output: []f32) void {

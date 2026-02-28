@@ -224,6 +224,11 @@ export class SonicForgeSDK {
     return this.processBuffer(channelData, (ptr, len) => process_bitcrusher(ptr, len, bits, normFreq, mix));
   }
 
+  processGain(channelData: Float32Array, gain: number): Float32Array {
+    const { process_gain } = this.wasmInstance!.exports as any;
+    return this.processBuffer(channelData, (ptr, len) => process_gain(ptr, len, gain));
+  }
+
   processDithering(channelData: Float32Array, bits: number): Float32Array {
     const { process_dithering } = this.wasmInstance!.exports as any;
     return this.processBuffer(channelData, (ptr, len) => process_dithering(ptr, len, bits));

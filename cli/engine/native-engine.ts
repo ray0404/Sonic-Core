@@ -410,9 +410,12 @@ export class NativeEngine implements SonicEngine {
               current = this.sdk!.processDebleed(current, current, mod.parameters.sensitivity ?? 0.5, mod.parameters.threshold ?? -40);
               break;
          case 'SPECTRAL_MATCH':
-              // In CLI, we might not have a reference capture mechanism yet, 
-              // but we can at least handle the type if it has an internal analysis.
-              // For now, let's assume it's a passthrough if no ref is provided.
+              if (mod.parameters.refAnalysisPtr) {
+                current = this.sdk.processSpectralMatch(current, mod.parameters.refAnalysisPtr as number, mod.parameters.amount ?? 0.15);
+              }
+              break;
+         case 'GAIN':
+              current = this.sdk.processGain(current, mod.parameters.gain ?? 1.0);
               break;
          case 'LUFS_NORMALIZER':
               current = this.sdk.processLufsNormalize(current, mod.parameters.targetLufs ?? -14);

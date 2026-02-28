@@ -8,6 +8,15 @@ export interface DirectorManifest {
   normalize?: {
     enabled: boolean;
     targetLufs: number;
+    albumMode?: {
+      weight: number; // 0.0 = Pure Album, 1.0 = Pure Track
+      truePeakCeiling?: number; // e.g. -1.0
+    };
+  };
+  spectralMatch?: {
+    enabled: boolean;
+    amount: number; // 0.0 to 1.0 (fractional match)
+    albumProfile?: boolean; // Use album average as reference
   };
 }
 
