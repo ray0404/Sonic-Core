@@ -1,6 +1,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { parseFilterString, FilterNode } from './process.js';
+import { parseFilterString, FilterNode } from './process.ts';
 
 describe('CLI Filter Parsing', () => {
   it('should parse simple filter strings', () => {

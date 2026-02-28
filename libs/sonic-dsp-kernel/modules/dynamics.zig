@@ -81,7 +81,7 @@ pub const Limiter = struct {
     compressor: Compressor = .{
         .threshold = -0.5,
         .ratio = 20,
-        .attack = 0.1,
+        .attack = 0.01, // Near-instant attack
         .release = 50,
         .knee = 0,
         .mix = 1,
@@ -90,6 +90,13 @@ pub const Limiter = struct {
     pub fn process(self: *Limiter, data: []f32) void {
         self.compressor.sample_rate = self.sample_rate;
         self.compressor.process(data);
+
+        // Hard Clip Stage to ensure strict ceiling
+        const ceiling = shared.dbToLinear(self.compressor.threshold);
+        for (data) |*s| {
+            if (s.* > ceiling) s.* = ceiling;
+            if (s.* < -ceiling) s.* = -ceiling;
+        }
     }
 };
 

@@ -142,3 +142,4 @@ repomix_SonicForge.xml
 nanobanana-output/
 .Jules/
 libs/sonic-dsp-kernel/.zig-cache/
+examples/

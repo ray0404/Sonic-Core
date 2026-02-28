@@ -9,7 +9,7 @@ describe('MixerEngine Refactor', () => {
     beforeEach(() => {
         engine = new MixerEngine();
         mockProvider = {
-            getModuleUrls: () => ['test-url.js']
+            getModuleUrls: () => ['test-url.ts']
         };
     });
 

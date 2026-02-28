@@ -5,8 +5,8 @@ import { Worker } from 'worker_threads';
 import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { BatchProcessOptions, FileProcessResult, DirectorManifest } from '../../packages/sonic-core/src/director-types.js';
-import { NativeEngine } from './native-engine.js';
+import type { BatchProcessOptions, FileProcessResult, DirectorManifest } from '../../packages/sonic-core/src/director-types.ts';
+import { NativeEngine } from './native-engine.ts';
 
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,40 +40,51 @@ export class Director {
     console.log(`[Director] Starting Phase 1: Analysis of ${files.length} tracks...`);
     const analyses: Map<string, TrackAnalysis> = new Map();
     
-    // Process analysis in parallel
-    const analysisTasks = files.map(async (file) => {
+    // 1. Parallel FFmpeg analysis (fast/stable)
+    const ffmpegTasks = files.map(async (file) => {
       const filePath = path.join(inputDir, file);
-      
-      // 1. FFmpeg for LUFS/TP (EBU R128)
-      // This is faster and standard for the initial pass
+      // Capture both stdout and stderr
       const { stderr } = await execAsync(`ffmpeg -nostats -i "${filePath}" -filter_complex ebur128=peak=true -f null -`);
-      const lufsMatch = stderr.match(/I:\s+([-+]?\d+\.\d+)\s+LUFS/);
-      const tpMatch = stderr.match(/True Peak:\s+([-+]?\d+\.\d+)\s+dBFS/);
       
-      const analysis: TrackAnalysis = {
-        lufs: lufsMatch ? parseFloat(lufsMatch[1]) : -14,
-        truePeak: tpMatch ? parseFloat(tpMatch[1]) : 0
+      // Look for the Integrated loudness section in the summary
+      const lufsSummaryMatch = stderr.match(/Integrated loudness:\s+I:\s+([-+]?\d+\.\d+)\s+LUFS/i);
+      // Look for the True peak section in the summary
+      const tpSummaryMatch = stderr.match(/True peak:\s+Peak:\s+([-+]?\d+\.\d+)\s+dBFS/i);
+      
+      const lufs = lufsSummaryMatch ? parseFloat(lufsSummaryMatch[1]) : -14;
+      const truePeak = tpSummaryMatch ? parseFloat(tpSummaryMatch[1]) : 0;
+      
+      return {
+        file,
+        lufs,
+        truePeak
       };
+    });
 
-      // 2. Sonic-Core for Spectral Profile (if enabled)
-      if (manifest.spectralMatch?.enabled) {
+    const ffmpegResults = await Promise.all(ffmpegTasks);
+    ffmpegResults.forEach(r => {
+      analyses.set(r.file, { lufs: r.lufs, truePeak: r.truePeak });
+    });
+
+    // 2. Sequential Sonic-Core analysis (avoids audio-decode/WASM race conditions)
+    if (manifest.spectralMatch?.enabled) {
+      console.log(`[Director] Capturing spectral profiles...`);
+      for (const file of files) {
+        const filePath = path.join(inputDir, file);
         const engine = new NativeEngine(this.wasmPath);
         await engine.init();
         const buffer = fs.readFileSync(filePath);
         await engine.loadAudio(buffer);
-        // Assuming we add a method to get raw magnitudes from the engine
-        // Or directly use SDK
+        
         const sdk = (engine as any).sdk;
-        const magnitudes = sdk.getFFTMagnitudes((engine as any).processedBuffer);
-        analysis.spectralProfile = magnitudes;
-        // Also capture a reference analysis pointer for phase 3
-        analysis.analysisPtr = sdk.spectralMatchAnalyze((engine as any).processedBuffer);
+        const analysisPtr = sdk.spectralMatchAnalyze((engine as any).processedBuffer);
+        const analysis = analyses.get(file)!;
+        analysis.spectralProfile = sdk.spectralMatchGetProfile(analysisPtr);
+        sdk.spectralMatchFree(analysisPtr);
+        
+        await engine.close();
       }
-
-      analyses.set(file, analysis);
-    });
-
-    await Promise.all(analysisTasks);
+    }
 
     // --- PHASE 2: Calculation & Aggregation ---
     console.log(`[Director] Starting Phase 2: Album aggregation...`);
@@ -122,13 +133,6 @@ export class Director {
     return new Promise((resolve) => {
       const processNext = () => {
         if (queue.length === 0 && activeWorkers === 0) {
-          // Cleanup WASM pointers before resolving
-          analyses.forEach(a => {
-            if (a.analysisPtr) {
-              // We'd need a way to reach the SDK to free this, 
-              // or handle it in the worker.
-            }
-          });
           resolve(results);
           return;
         }
@@ -143,6 +147,8 @@ export class Director {
           activeWorkers++;
           
           // Modify manifest for this specific track
+          const profileData = manifest.spectralMatch?.albumProfile ? albumProfile : analyses.get(file)?.spectralProfile;
+
           const trackManifest: DirectorManifest = {
             ...manifest,
             rack: [
@@ -153,11 +159,7 @@ export class Director {
                 type: 'SPECTRAL_MATCH' as any,
                 parameters: { 
                     amount: manifest.spectralMatch.amount,
-                    // In a real implementation, we'd pass the aggregated albumProfile 
-                    // to the worker via a shared buffer or serialized.
-                    // For now, let's assume we use the track's own analysisPtr as a placeholder
-                    // or pass the data.
-                    refAnalysisPtr: analyses.get(file)?.analysisPtr
+                    profileData: profileData
                 }
               }] : []),
               
@@ -185,7 +187,7 @@ export class Director {
             ]
           };
 
-          let workerPath = path.resolve(__dirname, 'director-worker.js');
+          let workerPath = path.resolve(__dirname, 'director-worker.ts');
           if (!fs.existsSync(workerPath)) {
               workerPath = path.resolve(__dirname, 'director-worker.ts');
           }

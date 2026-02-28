@@ -1,4 +1,4 @@
-import { RackModule, RackModuleType } from "../types.js";
+import type { RackModule, RackModuleType } from "../types.ts";
 
 export const createDefaultModule = (type: RackModuleType, id?: string): RackModule => {
     let params: any = {};

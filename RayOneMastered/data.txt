@@ -1,0 +1,60 @@
+--- Technical Analysis: CROWNS (SF) - Ray One.wav ---
+I:         -13.9 LUFS
+LRA:         5.3 LU
+Peak:       -5.1 dBFS
+--- Technical Analysis: Call It - Ray One.wav ---
+I:         -14.0 LUFS
+LRA:         3.0 LU
+Peak:       -4.1 dBFS
+--- Technical Analysis: Cherry Baby - Ray One.wav ---
+I:         -14.0 LUFS
+LRA:         2.5 LU
+Peak:       -5.1 dBFS
+--- Technical Analysis: Crown Me King - Ray One.wav ---
+I:         -14.0 LUFS
+LRA:         2.5 LU
+Peak:       -5.5 dBFS
+--- Technical Analysis: Goin  Up (ReCompedV4) - Ray One.wav ---
+I:         -13.9 LUFS
+LRA:         2.6 LU
+Peak:       -4.2 dBFS
+--- Technical Analysis: Golden Hour Dreams - Ray One.wav ---
+I:         -13.9 LUFS
+LRA:         5.2 LU
+Peak:       -3.8 dBFS
+--- Technical Analysis: Midnight - Ray One.wav ---
+I:         -14.0 LUFS
+LRA:         5.7 LU
+Peak:       -5.1 dBFS
+--- Technical Analysis: Money Madness - Ray One.wav ---
+I:         -14.0 LUFS
+LRA:         3.5 LU
+Peak:       -5.0 dBFS
+--- Technical Analysis: Nu Silence - Ray One.wav ---
+I:         -14.0 LUFS
+LRA:         2.6 LU
+Peak:       -5.5 dBFS
+--- Technical Analysis: Over and Over (Again) - Ray One.wav ---
+I:         -13.9 LUFS
+LRA:         3.5 LU
+Peak:       -3.7 dBFS
+--- Technical Analysis: Past Few Years (SF1) - Ray One.wav ---
+I:         -13.8 LUFS
+LRA:         5.1 LU
+Peak:       -3.4 dBFS
+--- Technical Analysis: Right Now (ReCompedV4) - Ray One.wav ---
+I:         -13.9 LUFS
+LRA:         3.5 LU
+Peak:       -4.4 dBFS
+--- Technical Analysis: Sicarios (ReCompedV4) - Ray One.wav ---
+I:         -13.8 LUFS
+LRA:         1.4 LU
+Peak:       -4.8 dBFS
+--- Technical Analysis: THRONEs - Ray One.wav ---
+I:         -14.0 LUFS
+LRA:         2.9 LU
+Peak:       -3.1 dBFS
+--- Technical Analysis: WHEN I WALK IN (SF) - Ray One.wav ---
+I:         -13.9 LUFS
+LRA:         5.3 LU
+Peak:       -5.7 dBFS

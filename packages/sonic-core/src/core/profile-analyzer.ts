@@ -1,5 +1,5 @@
-import { SonicForgeSDK as SonicSDK } from '../sdk.js';
-import { RackModule } from '../types.js';
+import { SonicForgeSDK as SonicSDK } from '../sdk.ts';
+import type { RackModule } from '../types.ts';
 
 export interface AudioProfile {
     lufs: number;
@@ -14,7 +14,10 @@ export interface AudioProfile {
 }
 
 export class ProfileAnalyzer {
-    constructor(private sdk: SonicSDK) {}
+    private sdk: SonicSDK;
+    constructor(sdk: SonicSDK) {
+        this.sdk = sdk;
+    }
 
     analyze(buffer: Float32Array, channels: number, sampleRate: number): AudioProfile {
         const stats = this.sdk.analyzeAudio(buffer, channels, sampleRate);

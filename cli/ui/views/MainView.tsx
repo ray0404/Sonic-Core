@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Text, useApp } from 'ink';
 import SelectInput from 'ink-select-input';
-import { MeterBar } from '../components/MeterBar.js';
-import { useTUIStore } from '../store.js';
-import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.js';
+import { MeterBar } from '../components/MeterBar.ts';
+import { useTUIStore } from '../store.ts';
+import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.ts';
 
 export const MainView = ({ engine }: { engine: SonicEngine }) => {
   const { exit } = useApp();

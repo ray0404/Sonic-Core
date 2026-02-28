@@ -7,22 +7,22 @@ import {
     IStereoPannerNode,
     IAnalyserNode
 } from "standardized-audio-context";
-import { ContextManager } from "./context-manager.js";
-import type { RackModule } from "../types.js";
-import { NodeFactory } from "./node-factory.js";
-import { ConvolutionNode } from "../worklets/ConvolutionNode.js";
-import { GuitarRigNode } from "../worklets/GuitarRigNode.js";
-import { DrumMachineNode } from "../worklets/DrumMachineNode.js";
-import { TabPlayerNode } from "../worklets/TabPlayerNode.js";
-import { MetronomeNode } from "../worklets/MetronomeNode.js";
-import { TunerNode } from "../worklets/TunerNode.js";
-import { PedalCompressorNode } from "../worklets/PedalCompressorNode.js";
-import { PedalOverdriveNode } from "../worklets/PedalOverdriveNode.js";
-import { PedalSupernovaNode } from "../worklets/PedalSupernovaNode.js";
-import { PedalChorusNode } from "../worklets/PedalChorusNode.js";
-import { PedalTremoloNode } from "../worklets/PedalTremoloNode.js";
-import { PedalDelayNode } from "../worklets/PedalDelayNode.js";
-import { PedalReverbNode } from "../worklets/PedalReverbNode.js";
+import { ContextManager } from "./context-manager.ts";
+import type { RackModule } from "../types.ts";
+import { NodeFactory } from "./node-factory.ts";
+import { ConvolutionNode } from "../worklets/ConvolutionNode.ts";
+import { GuitarRigNode } from "../worklets/GuitarRigNode.ts";
+import { DrumMachineNode } from "../worklets/DrumMachineNode.ts";
+import { TabPlayerNode } from "../worklets/TabPlayerNode.ts";
+import { MetronomeNode } from "../worklets/MetronomeNode.ts";
+import { TunerNode } from "../worklets/TunerNode.ts";
+import { PedalCompressorNode } from "../worklets/PedalCompressorNode.ts";
+import { PedalOverdriveNode } from "../worklets/PedalOverdriveNode.ts";
+import { PedalSupernovaNode } from "../worklets/PedalSupernovaNode.ts";
+import { PedalChorusNode } from "../worklets/PedalChorusNode.ts";
+import { PedalTremoloNode } from "../worklets/PedalTremoloNode.ts";
+import { PedalDelayNode } from "../worklets/PedalDelayNode.ts";
+import { PedalReverbNode } from "../worklets/PedalReverbNode.ts";
 
 export class TrackStrip {
     public id: string;

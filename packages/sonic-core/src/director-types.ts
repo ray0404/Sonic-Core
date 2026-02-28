@@ -1,4 +1,4 @@
-import { RackModule } from './types.js';
+import type { RackModule } from './types.ts';
 
 export interface DirectorManifest {
   rack: RackModule[];

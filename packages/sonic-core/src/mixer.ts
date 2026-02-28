@@ -1,10 +1,10 @@
-import { ContextManager } from "./core/context-manager.js";
-import { TrackStrip } from "./core/track-strip.js";
-import { BusStrip } from "./core/bus-strip.js";
-import { logger } from "../../../src/utils/logger.js";
-import { WorkletProvider } from "./core/types.js";
-import { EngineCommand } from "./protocol.js";
-import { createDefaultModule } from "./core/module-utils.js";
+import { ContextManager } from "./core/context-manager.ts";
+import { TrackStrip } from "./core/track-strip.ts";
+import { BusStrip } from "./core/bus-strip.ts";
+import { logger } from "../../../src/utils/logger.ts";
+import { WorkletProvider } from "./core/types.ts";
+import { EngineCommand } from "./protocol.ts";
+import { createDefaultModule } from "./core/module-utils.ts";
 
 export class MixerEngine {
     private tracks = new Map<string, TrackStrip>();

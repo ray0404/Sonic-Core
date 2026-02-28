@@ -151,40 +151,31 @@ fn apply_filter(input: []f32, output: []f32) void {
 
 export fn process_lufs_normalize(ptr: [*]f32, len: usize, target_lufs: f32) void {
     const data = ptr[0..len];
-    const filtered = allocator.alloc(f32, len) catch return;
-    defer allocator.free(filtered);
-
-    apply_filter(data, filtered);
-
-    var sum_sq: f32 = 0;
-    const vec_len = 4;
-    var i: usize = 0;
-    const loop_len = len - (len % vec_len);
     
-    while (i < loop_len) : (i += vec_len) {
-        const v: @Vector(vec_len, f32) = data[i..][0..vec_len].*;
-        const v_sq = v * v;
-        sum_sq += @reduce(.Add, v_sq);
-    }
-    while (i < len) : (i += 1) {
-        sum_sq += filtered[i] * filtered[i];
+    // 1. Apply K-Weighting Filter (Full 2-stage)
+    var filter_l = KWeighting{};
+    var filter_r = KWeighting{};
+    var sum_sq: f64 = 0;
+
+    var i: usize = 0;
+    while (i < len - 1) : (i += 2) {
+        const l = data[i];
+        const r = data[i+1];
+        const kw_l = filter_l.process(l);
+        const kw_r = filter_r.process(r);
+        sum_sq += @as(f64, kw_l) * kw_l + @as(f64, kw_r) * kw_r;
     }
 
-    const mean_sq = sum_sq / @as(f32, @floatFromInt(len));
-    const rms_db = math.linearToDb(std.math.sqrt(mean_sq));
-    const current_lufs = rms_db - 0.691;
-    const delta_db = target_lufs - current_lufs;
+    // 2. Calculate LUFS
+    const num_frames = @as(f64, @floatFromInt(len)) / 2.0;
+    const mean_sq = sum_sq / num_frames;
+    const current_lufs = (10.0 * std.math.log10(mean_sq + 1e-12)) - 0.691;
+    const delta_db = target_lufs - @as(f32, @floatCast(current_lufs));
     const linear_gain = math.dbToLinear(delta_db);
 
-    i = 0;
-    while (i < loop_len) : (i += vec_len) {
-        var v: @Vector(vec_len, f32) = data[i..][0..vec_len].*;
-        const gain_vec: @Vector(vec_len, f32) = @splat(linear_gain);
-        v = v * gain_vec;
-        data[i..][0..vec_len].* = v;
-    }
-    while (i < len) : (i += 1) {
-        data[i] *= linear_gain;
+    // 3. Apply Gain
+    for (data) |*s| {
+        s.* *= linear_gain;
     }
 }
 
@@ -639,7 +630,9 @@ export fn analyze_audio_comprehensive(ptr: [*]f32, len: usize, channels: i32, sa
         // --- K-Weighting for Loudness ---
         const kw_l = k_filter_l.process(l);
         const kw_r = k_filter_r.process(r);
-        const energy_weighted = kw_l * kw_l + kw_r * kw_r; 
+        
+        // EBU R128 Summing: Power = sum(G_i * mean_sq_i)
+        const energy_weighted = if (chan_count == 2) kw_l * kw_l + kw_r * kw_r else kw_l * kw_l;
         sum_sq_weighted += energy_weighted;
         
         // --- LRA / Short Term Accumulation ---

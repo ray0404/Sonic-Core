@@ -38,6 +38,9 @@ export class SonicForgeSDK {
     
     // 1. Allocate memory in WASM
     const ptr = alloc(channelData.length);
+    if (ptr === 0) {
+      throw new Error(`WASM memory allocation failed for buffer of size ${channelData.length} samples.`);
+    }
     
     try {
       // 2. Copy data to WASM
@@ -191,6 +194,31 @@ export class SonicForgeSDK {
       return spectralmatch_analyze_ref(ptr, channelData.length);
     } finally {
       free(ptr, channelData.length);
+    }
+  }
+
+  spectralMatchGetProfile(analysisPtr: number): Float32Array {
+    if (!this.wasmInstance || !this.memory) throw new Error('SDK not initialized');
+    const { memory } = this.wasmInstance.exports as any;
+    // analysisPtr is pointer to struct { power_spectrum: []f32, size: usize }
+    // []f32 is struct { ptr: [*]f32, len: usize } in Zig
+    // So AnalysisResult is:
+    // { ptr: [*]f32, len: usize, size: usize }
+    const view = new DataView(memory.buffer, analysisPtr, 12);
+    const dataPtr = view.getUint32(0, true);
+    const dataLen = view.getUint32(4, true);
+    return new Float32Array(memory.buffer, dataPtr, dataLen).slice();
+  }
+
+  spectralMatchHydrate(profileData: Float32Array): number {
+    if (!this.wasmInstance || !this.memory) throw new Error('SDK not initialized');
+    const { alloc, free, spectralmatch_hydrate_profile } = this.wasmInstance.exports as any;
+    const ptr = alloc(profileData.length);
+    try {
+      new Float32Array(this.memory.buffer, ptr, profileData.length).set(profileData);
+      return spectralmatch_hydrate_profile(ptr, profileData.length);
+    } finally {
+      free(ptr, profileData.length);
     }
   }
 

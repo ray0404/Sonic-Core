@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
-import { useTUIStore } from '../store.js';
-import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.js';
+import { useTUIStore } from '../store.ts';
+import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.ts';
 import fs from 'fs';
 import path from 'path';
 

@@ -1,4 +1,4 @@
-import { RackModuleType } from "./types.js";
+import type { RackModuleType } from "./types.ts";
 
 export type EngineCommand =
   | { type: 'TRACK_ADD'; payload: { id: string; name: string } }

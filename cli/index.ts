@@ -54,7 +54,7 @@ program
         process.exit(1);
     }
 
-    const { processAudio } = await import('./process.js');
+    const { processAudio } = await import('./process.ts');
     try {
         await processAudio({
             input,
@@ -92,7 +92,7 @@ program
     }
 
     try {
-        const { NativeEngine } = await import('./engine/native-engine.js');
+        const { NativeEngine } = await import('./engine/native-engine.ts');
         const engine = new NativeEngine(wasmPath);
         await engine.init();
         
@@ -147,8 +147,8 @@ program
     }
 
     try {
-      const { NativeEngine } = await import('./engine/native-engine.js');
-      const { runTUI } = await import('./ui/index.js');
+      const { NativeEngine } = await import('./engine/native-engine.ts');
+      const { runTUI } = await import('./ui/index.tsx');
       
       const engine = new NativeEngine(wasmPath);
       await engine.init();
@@ -187,7 +187,7 @@ program
     }
 
     try {
-        const { Director } = await import('./engine/director.js');
+        const { Director } = await import('./engine/director.ts');
         const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
         const director = new Director(wasmPath);
         

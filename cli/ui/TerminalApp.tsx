@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { Box, useInput, useApp } from 'ink';
-import { SonicEngine } from '../../packages/sonic-core/src/engine-interface.js';
-import { useTUIStore } from './store.js';
-import { linearToDb } from '../../packages/sonic-core/src/utils/audio-math.js';
+import { SonicEngine } from '../../packages/sonic-core/src/engine-interface.ts';
+import { useTUIStore } from './store.ts';
+import { linearToDb } from '../../packages/sonic-core/src/utils/audio-math.ts';
 
 // Import Views
-import { MainView } from './views/MainView.js';
-import { RackView } from './views/RackView.js';
-import { AddModuleView } from './views/AddModuleView.js';
-import { ModuleEditView } from './views/ModuleEditView.js';
-import { LoadFileView } from './views/LoadFileView.js';
-import { ExportView } from './views/ExportView.js';
-import { AnalyzerView } from './views/AnalyzerView.js';
-import { SmartAssistView } from './views/SmartAssistView.js';
+import { MainView } from './views/MainView.ts';
+import { RackView } from './views/RackView.ts';
+import { AddModuleView } from './views/AddModuleView.ts';
+import { ModuleEditView } from './views/ModuleEditView.ts';
+import { LoadFileView } from './views/LoadFileView.ts';
+import { ExportView } from './views/ExportView.ts';
+import { AnalyzerView } from './views/AnalyzerView.ts';
+import { SmartAssistView } from './views/SmartAssistView.ts';
 
 export const TerminalApp = ({ engine }: { engine: SonicEngine }) => {
   const { view, setView, setRack, setPlayback, setMetering, setMessage, setModuleDescriptors, playback, setSuggestions } = useTUIStore();

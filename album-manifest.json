@@ -1,0 +1,18 @@
+{
+  "normalize": {
+    "enabled": true,
+    "targetLufs": -14.0,
+    "albumMode": {
+      "weight": 0.3,
+      "truePeakCeiling": -1.0
+    }
+  },
+  "spectralMatch": {
+    "enabled": true,
+    "amount": 0.15,
+    "albumProfile": true
+  },
+  "rack": [],
+  "format": "wav",
+  "sampleRate": 48000
+}

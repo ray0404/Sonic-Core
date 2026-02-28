@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NativeEngine } from './native-engine.js';
-import { SonicForgeSDK } from '../../packages/sonic-core/src/sdk.js';
+import { NativeEngine } from './native-engine.ts';
+import { SonicForgeSDK } from '../../packages/sonic-core/src/sdk.ts';
 
 // Mock SonicForgeSDK
 vi.mock('../../packages/sonic-core/src/sdk', () => {

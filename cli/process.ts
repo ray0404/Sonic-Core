@@ -2,8 +2,8 @@
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
-import { NativeEngine } from './engine/native-engine.js';
-import { RackModuleType } from '../packages/sonic-core/src/types.js';
+import { NativeEngine } from './engine/native-engine.ts';
+import type { RackModuleType } from '../packages/sonic-core/src/types.ts';
 
 export interface FilterNode {
     type: RackModuleType;

@@ -22,8 +22,8 @@ export interface MeteringData {
   };
 }
 
-import { RackModule, RackModuleType } from './types.js';
-import { ModuleDescriptor } from './module-descriptors.js';
+import type { RackModule, RackModuleType } from './types.ts';
+import type { ModuleDescriptor } from './module-descriptors.ts';
 
 export interface SonicEngine {
   init(): Promise<void>;

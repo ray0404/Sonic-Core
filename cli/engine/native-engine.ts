@@ -4,18 +4,18 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import decode from 'audio-decode';
 import { spawn, ChildProcess } from 'child_process';
-import { 
+import type { 
   SonicEngine, 
   PlaybackState, 
   MeteringData
-} from '../../packages/sonic-core/src/engine-interface.js';
-import { RackModule, RackModuleType } from '../../packages/sonic-core/src/types.js';
-import { ProfileAnalyzer } from '../../packages/sonic-core/src/core/profile-analyzer.js';
-import { SonicForgeSDK } from '../../packages/sonic-core/src/sdk.js';
-import { getModuleDescriptors } from '../../packages/sonic-core/src/module-descriptors.js';
-import { encodeWAV } from '../../src/utils/wav-export.js';
-import * as OfflineDSP from '../../packages/sonic-core/src/core/offline-processors.js';
-import { linearToDb, dbToLinear } from '../../packages/sonic-core/src/utils/audio-math.js';
+} from '../../packages/sonic-core/src/engine-interface.ts';
+import type { RackModule, RackModuleType } from '../../packages/sonic-core/src/types.ts';
+import { ProfileAnalyzer } from '../../packages/sonic-core/src/core/profile-analyzer.ts';
+import { SonicForgeSDK } from '../../packages/sonic-core/src/sdk.ts';
+import { getModuleDescriptors } from '../../packages/sonic-core/src/module-descriptors.ts';
+import { encodeWAV } from '../../src/utils/wav-export.ts';
+import * as OfflineDSP from '../../packages/sonic-core/src/core/offline-processors.ts';
+import { linearToDb, dbToLinear } from '../../packages/sonic-core/src/utils/audio-math.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -73,7 +73,7 @@ export class NativeEngine implements SonicEngine {
     this.sampleRate = audio.sampleRate;
     this.duration = audio.duration;
     this.processedBuffer = new Float32Array(this.sourceBuffer);
-    this.applyRack();
+    await this.applyRack();
   }
 
   private interleave(l: Float32Array, r: Float32Array): Float32Array {
@@ -85,7 +85,7 @@ export class NativeEngine implements SonicEngine {
     return result;
   }
 
-  private applyRack() {
+  private async applyRack() {
     if (!this.sourceBuffer || !this.sdk) return;
     
     // Prevent concurrent processing - queue if already processing
@@ -410,7 +410,11 @@ export class NativeEngine implements SonicEngine {
               current = this.sdk!.processDebleed(current, current, mod.parameters.sensitivity ?? 0.5, mod.parameters.threshold ?? -40);
               break;
          case 'SPECTRAL_MATCH':
-              if (mod.parameters.refAnalysisPtr) {
+              if (mod.parameters.profileData) {
+                const analysisPtr = this.sdk.spectralMatchHydrate(new Float32Array(Object.values(mod.parameters.profileData)));
+                current = this.sdk.processSpectralMatch(current, analysisPtr, mod.parameters.amount ?? 0.15);
+                this.sdk.spectralMatchFree(analysisPtr);
+              } else if (mod.parameters.refAnalysisPtr) {
                 current = this.sdk.processSpectralMatch(current, mod.parameters.refAnalysisPtr as number, mod.parameters.amount ?? 0.15);
               }
               break;
@@ -483,7 +487,7 @@ export class NativeEngine implements SonicEngine {
     this.isProcessingRack = false;
     if (this.pendingRackUpdate) {
       this.pendingRackUpdate = false;
-      this.applyRack();
+      await this.applyRack();
     }
   }
 
@@ -495,12 +499,12 @@ export class NativeEngine implements SonicEngine {
       this.rack[modIndex].parameters[paramId] = safeValue;
       // Invalidate cache from this module onwards
       this.cacheStack = this.cacheStack.slice(0, modIndex);
-      this.applyRack();
+      await this.applyRack();
     }
   }
 
-  async addModule(type: RackModuleType) {
-    const id = Math.random().toString(36).substr(2, 9);
+  async addModule(type: RackModuleType, customId?: string) {
+    const id = customId || Math.random().toString(36).substr(2, 9);
     const descriptors = getModuleDescriptors();
     const descriptor = descriptors[type];
     const parameters: Record<string, any> = {};
@@ -518,7 +522,7 @@ export class NativeEngine implements SonicEngine {
       bypass: false,
       parameters
     });
-    this.applyRack();
+    await this.applyRack();
   }
 
   async removeModule(id: string) {
@@ -526,7 +530,7 @@ export class NativeEngine implements SonicEngine {
     if (modIndex !== -1) {
         this.rack.splice(modIndex, 1);
         this.cacheStack = this.cacheStack.slice(0, modIndex);
-        this.applyRack();
+        await this.applyRack();
     }
   }
 
@@ -535,7 +539,7 @@ export class NativeEngine implements SonicEngine {
     this.rack.splice(end, 0, removed);
     // Invalidate from the earlier of the two indices
     this.cacheStack = this.cacheStack.slice(0, Math.min(start, end));
-    this.applyRack();
+    await this.applyRack();
   }
 
   async toggleModuleBypass(id: string) {
@@ -544,7 +548,7 @@ export class NativeEngine implements SonicEngine {
       this.rack[modIndex].bypass = !this.rack[modIndex].bypass;
       // Invalidate cache from this module onwards
       this.cacheStack = this.cacheStack.slice(0, modIndex);
-      this.applyRack();
+      await this.applyRack();
     }
   }
 

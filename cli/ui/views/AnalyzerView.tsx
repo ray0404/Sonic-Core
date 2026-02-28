@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Text, useStdout } from 'ink';
-import { MeterBar } from '../components/MeterBar.js';
-import { SpectralVisualizer } from '../components/SpectralVisualizer.js';
-import { useTUIStore } from '../store.js';
-import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.js';
+import { MeterBar } from '../components/MeterBar.ts';
+import { SpectralVisualizer } from '../components/SpectralVisualizer.ts';
+import { useTUIStore } from '../store.ts';
+import { SonicEngine } from '../../../packages/sonic-core/src/engine-interface.ts';
 
 export const AnalyzerView = ({ engine }: { engine: SonicEngine }) => {
   const { playback, metering, setView, showAnalyzerStats } = useTUIStore();
