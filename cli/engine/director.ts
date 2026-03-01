@@ -13,6 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 interface TrackAnalysis {
   lufs: number;
+  lra: number;
   truePeak: number;
   spectralProfile?: Float32Array;
   analysisPtr?: number; // Pointer to WASM analysis result
@@ -48,22 +49,26 @@ export class Director {
       
       // Look for the Integrated loudness section in the summary
       const lufsSummaryMatch = stderr.match(/Integrated loudness:\s+I:\s+([-+]?\d+\.\d+)\s+LUFS/i);
+      // Look for the Loudness range section in the summary
+      const lraSummaryMatch = stderr.match(/Loudness range:\s+LRA:\s+([-+]?\d+\.\d+)\s+LU/i);
       // Look for the True peak section in the summary
       const tpSummaryMatch = stderr.match(/True peak:\s+Peak:\s+([-+]?\d+\.\d+)\s+dBFS/i);
       
       const lufs = lufsSummaryMatch ? parseFloat(lufsSummaryMatch[1]) : -14;
+      const lra = lraSummaryMatch ? parseFloat(lraSummaryMatch[1]) : 10;
       const truePeak = tpSummaryMatch ? parseFloat(tpSummaryMatch[1]) : 0;
       
       return {
         file,
         lufs,
+        lra,
         truePeak
       };
     });
 
     const ffmpegResults = await Promise.all(ffmpegTasks);
     ffmpegResults.forEach(r => {
-      analyses.set(r.file, { lufs: r.lufs, truePeak: r.truePeak });
+      analyses.set(r.file, { lufs: r.lufs, lra: r.lra, truePeak: r.truePeak });
     });
 
     // 2. Sequential Sonic-Core analysis (avoids audio-decode/WASM race conditions)
@@ -162,8 +167,19 @@ export class Director {
                     profileData: profileData
                 }
               }] : []),
+
+              // 2. LRA Compression (if targetLra is set)
+              ...(manifest.normalize?.targetLra ? [{
+                id: 'album-compressor',
+                name: 'Album LRA Matching Compressor',
+                type: 'ZIG_COMPRESSOR' as any,
+                parameters: {
+                  threshold: 0.66, // -20 dB initial
+                  ratio: 0.052 // 2:1 initial (1.0 + (0.052 * 19.0) = 2.0 approx)
+                }
+              }] : []),
               
-              // 2. Hybrid Gain
+              // 3. Hybrid Gain
               {
                 id: 'hybrid-gain',
                 name: 'Hybrid Normalization Gain',

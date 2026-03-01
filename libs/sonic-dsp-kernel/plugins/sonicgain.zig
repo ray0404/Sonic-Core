@@ -1,12 +1,13 @@
 const std = @import("std");
+const GainStage = @import("../dsp/gain_stage.zig").GainStage;
 
 pub const GainPlugin = struct {
-    gain: f32,
+    gain_stage: GainStage,
     sample_rate: f32,
 
     pub fn init(allocator: std.mem.Allocator, sample_rate: f32) !*GainPlugin {
         const self = try allocator.create(GainPlugin);
-        self.gain = 1.0;
+        self.gain_stage = GainStage.init(1.0);
         self.sample_rate = sample_rate;
         return self;
     }
@@ -21,21 +22,29 @@ pub const GainPlugin = struct {
         const out_l = outputs[0];
         const out_r = outputs[1];
         
-        for (0..frames) |i| {
-            out_l[i] = in_l[i] * self.gain;
-            out_r[i] = in_r[i] * self.gain;
-        }
+        // Copy inputs to outputs first (it's an in-place-ish system)
+        @memcpy(out_l[0..frames], in_l[0..frames]);
+        @memcpy(out_r[0..frames], in_r[0..frames]);
+        
+        // Apply the high-quality gain stage
+        self.gain_stage.processStereo(out_l[0..frames], out_r[0..frames]);
     }
 
     pub fn setParameter(self: *GainPlugin, index: i32, value: f32) void {
         if (index == 0) {
-            self.gain = value;
+            // value is usually 0.0 to 1.0 (normalized)
+            // But for gain we might want a dB range or direct linear.
+            // Let's assume normalized 0-1 maps to -60 to +12 dB
+            const db = (value * 72.0) - 60.0;
+            self.gain_stage.setGainDb(db);
         }
     }
 
     pub fn getParameter(self: *GainPlugin, index: i32) f32 {
         if (index == 0) {
-            return self.gain;
+            // Inverse mapping: (db + 60) / 72
+            const db = if (self.gain_stage.target_gain > 0.0001) 20.0 * std.math.log10(f32, self.gain_stage.target_gain) else -60.0;
+            return std.math.clamp((db + 60.0) / 72.0, 0.0, 1.0);
         }
         return 0.0;
     }

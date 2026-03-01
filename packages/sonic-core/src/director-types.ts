@@ -8,6 +8,7 @@ export interface DirectorManifest {
   normalize?: {
     enabled: boolean;
     targetLufs: number;
+    targetLra?: number; // Target Loudness Range (LRA)
     albumMode?: {
       weight: number; // 0.0 = Pure Album, 1.0 = Pure Track
       truePeakCeiling?: number; // e.g. -1.0

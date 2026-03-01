@@ -144,3 +144,4 @@ nanobanana-output/
 libs/sonic-dsp-kernel/.zig-cache/
 examples/
 RayOneMastered/*.wav
+examples/
